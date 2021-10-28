@@ -1,6 +1,8 @@
+require_relative 'lib/cuber/version'
+
 Gem::Specification.new do |s|
   s.name = 'cuber'
-  s.version = '0.0.0'
+  s.version = Cuber::VERSION
   s.summary = 'Cuber'
   s.author = 'Cuber'
   s.executables = ['cuber']
