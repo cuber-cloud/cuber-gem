@@ -1,2 +1,15 @@
 #!/usr/bin/env ruby
-puts "Hi, I'm Cuber"
+require 'optparse'
+
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: cuber [OPTIONS] COMMAND'
+
+  opts.on('-e', '--environment ENVIRONMENT', 'Set the environment (e.g. production)') do |e|
+    options[:environment] = e
+  end
+end.parse!
+
+p options
+p ARGV
