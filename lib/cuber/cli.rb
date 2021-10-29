@@ -7,13 +7,22 @@ module Cuber
       @options = {}
       parse_options!
       parse_cuberfile
-      cmd = ARGV.first&.to_sym
-      abort "Cuber: \"#{cmd}\" is not a command" unless cmd and respond_to? cmd
-      public_send cmd
+      @options[:cmd] = ARGV.first&.to_sym
+      validate_options
+      public_send @options[:cmd]
     end
 
     def version
       puts "Cuber v#{Cuber::VERSION}"
+    end
+
+    def checkout
+      system 'git', 'clone', '--depth', '1', @options[:repo], 'cuberwd'
+    end
+
+    def validate_options
+      abort "Cuber: \"#{@options[:cmd]}\" is not a command" unless @options[:cmd] and respond_to? @options[:cmd]
+      abort 'Cuberfile: repo must be present' if @options[:repo].to_s.strip.empty?
     end
 
     private

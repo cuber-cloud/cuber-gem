@@ -2,6 +2,7 @@ module Cuber
   class CuberfileParser
     def initialize
       @app = nil
+      @repo = nil
       @procs = []
     end
 
@@ -11,6 +12,10 @@ module Cuber
 
     def app name
       @app = name
+    end
+
+    def repo uri
+      @repo = uri
     end
 
     def proc name, replicas = 1
