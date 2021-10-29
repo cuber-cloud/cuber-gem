@@ -1,4 +1,5 @@
 require 'optparse'
+require 'fileutils'
 
 module Cuber
   class CLI
@@ -17,7 +18,10 @@ module Cuber
     end
 
     def checkout
-      system 'git', 'clone', '--depth', '1', @options[:repo], 'cuberwd'
+      path = '.cuber/repo'
+      FileUtils.mkdir_p path
+      FileUtils.rm_rf path, secure: true
+      system('git', 'clone', '--depth', '1', @options[:repo], path) || abort('Cuber: git clone failed')
     end
 
     def validate_options
