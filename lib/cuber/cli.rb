@@ -28,7 +28,8 @@ module Cuber
     end
 
     def parse_cuberfile
-      content = File.read('Cuberfile')
+      abort 'Cuberfile not found in current directory' unless File.exists? 'Cuberfile'
+      content = File.read 'Cuberfile'
       parser = CuberfileParser.new
       parser.instance_eval(content)
       cuberfile_options = parser.instance_variables.map do |name|
