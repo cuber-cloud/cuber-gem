@@ -24,11 +24,6 @@ module Cuber
       system('git', 'clone', '--depth', '1', @options[:repo], path) || abort('Cuber: git clone failed')
     end
 
-    def validate_options
-      abort "Cuber: \"#{@options[:cmd]}\" is not a command" unless @options[:cmd] and respond_to? @options[:cmd]
-      abort 'Cuberfile: repo must be present' if @options[:repo].to_s.strip.empty?
-    end
-
     private
 
     def parse_options!
@@ -49,6 +44,11 @@ module Cuber
         [name[1..-1].to_sym, parser.instance_variable_get(name)]
       end.to_h
       @options.merge! cuberfile_options
+    end
+
+    def validate_options
+      abort "Cuber: \"#{@options[:cmd]}\" is not a command" unless @options[:cmd] and respond_to? @options[:cmd]
+      abort 'Cuberfile: repo must be present' if @options[:repo].to_s.strip.empty?
     end
 
   end
