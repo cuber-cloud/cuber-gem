@@ -1,5 +1,6 @@
 require 'optparse'
 require 'fileutils'
+require 'erb'
 
 module Cuber
   class CLI
@@ -22,6 +23,16 @@ module Cuber
       FileUtils.mkdir_p path
       FileUtils.rm_rf path, secure: true
       system('git', 'clone', '--depth', '1', @options[:repo], path) || abort('Cuber: git clone failed')
+    end
+
+    def dockerfile
+      return if @options[:dockerfile]
+      template = File.join __dir__, 'templates', 'Dockerfile.erb'
+      renderer = ERB.new File.read template
+      content = renderer.result binding
+      path = '.cuber/repo'
+      FileUtils.mkdir_p path
+      File.write File.join(path, 'Dockerfile'), content
     end
 
     private
@@ -49,6 +60,8 @@ module Cuber
     def validate_options
       abort "Cuber: \"#{@options[:cmd]}\" is not a command" unless @options[:cmd] and respond_to? @options[:cmd]
       abort 'Cuberfile: repo must be present' if @options[:repo].to_s.strip.empty?
+      abort 'Cuberfile: dockerfile must be a file' unless @options[:dockerfile].nil? or File.exists? @options[:dockerfile]
+      abort 'Cuberfile: ruby version must be present' if @options[:ruby].to_s.strip.empty?
     end
 
   end

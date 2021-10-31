@@ -3,6 +3,8 @@ module Cuber
     def initialize
       @app = nil
       @repo = nil
+      @dockerfile = nil
+      @ruby = nil
       @procs = []
     end
 
@@ -16,6 +18,14 @@ module Cuber
 
     def repo uri
       @repo = uri
+    end
+
+    def dockerfile path
+      @dockerfile = path
+    end
+
+    def ruby version
+      @ruby = version
     end
 
     def proc name, replicas = 1
