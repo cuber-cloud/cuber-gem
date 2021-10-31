@@ -5,6 +5,7 @@ module Cuber
       @repo = nil
       @dockerfile = nil
       @ruby = nil
+      @image = nil
       @procs = []
     end
 
@@ -26,6 +27,10 @@ module Cuber
 
     def ruby version
       @ruby = version
+    end
+
+    def image name
+      @image = name
     end
 
     def proc name, replicas = 1

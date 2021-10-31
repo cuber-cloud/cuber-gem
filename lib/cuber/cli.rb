@@ -1,5 +1,6 @@
 require 'optparse'
 require 'fileutils'
+require 'open3'
 require 'erb'
 
 module Cuber
@@ -35,6 +36,12 @@ module Cuber
       File.write File.join(path, 'Dockerfile'), content
     end
 
+    def build
+      dockerfile = @options[:dockerfile] || 'Dockerfile'
+      tag = "#{@options[:image]}:#{commit_hash}"
+      system('docker', 'build', '-f', dockerfile, '-t', tag, '.', chdir: '.cuber/repo') || abort('Cuber: docker build failed')
+    end
+
     private
 
     def parse_options!
@@ -62,6 +69,13 @@ module Cuber
       abort 'Cuberfile: repo must be present' if @options[:repo].to_s.strip.empty?
       abort 'Cuberfile: dockerfile must be a file' unless @options[:dockerfile].nil? or File.exists? @options[:dockerfile]
       abort 'Cuberfile: ruby version must be present' if @options[:ruby].to_s.strip.empty?
+      abort 'Cuberfile: image must be present' if @options[:image].to_s.strip.empty?
+    end
+
+    def commit_hash
+      out, status = Open3.capture2 'git', 'rev-parse', 'HEAD', chdir: '.cuber/repo'
+      abort 'Cuber: cannot get commit hash' unless status.success?
+      out.strip
     end
 
   end
