@@ -42,6 +42,11 @@ module Cuber
       system('docker', 'build', '-f', dockerfile, '-t', tag, '.', chdir: '.cuber/repo') || abort('Cuber: docker build failed')
     end
 
+    def push
+      tag = "#{@options[:image]}:#{commit_hash}"
+      system('docker', 'push', tag) || abort('Cuber: docker push failed')
+    end
+
     private
 
     def parse_options!
