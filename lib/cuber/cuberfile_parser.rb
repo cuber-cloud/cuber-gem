@@ -9,7 +9,7 @@ module Cuber
       @procs = []
     end
 
-    def method_missing m
+    def method_missing m, *args
       abort "Cuberfile: \"#{m}\" is not a command"
     end
 
