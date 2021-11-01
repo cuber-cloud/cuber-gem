@@ -47,6 +47,16 @@ module Cuber
       system('docker', 'push', tag) || abort('Cuber: docker push failed')
     end
 
+    def configure
+      @options[:commit_hash] = commit_hash
+      template = File.join __dir__, 'templates', 'deployment.yml.erb'
+      renderer = ERB.new File.read template
+      content = renderer.result binding
+      path = '.cuber/kubernetes'
+      FileUtils.mkdir_p path
+      File.write File.join(path, 'deployment.yml'), content
+    end
+
     private
 
     def parse_options!

@@ -1,0 +1,38 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: <%= @options[:app] %>
+  labels:
+    app.kubernetes.io/name: <%= @options[:app] %>
+    app.kubernetes.io/version: <%= @options[:commit_hash] %>
+    app.kubernetes.io/managed-by: cuber
+
+<% @options[:procs].each do |proc| %>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: <%= proc[:name] %>-deployment
+  namespace: <%= @options[:app] %>
+  labels:
+    app.kubernetes.io/name: <%= @options[:app] %>
+    app.kubernetes.io/version: <%= @options[:commit_hash] %>
+    app.kubernetes.io/managed-by: cuber
+spec:
+  replicas: <%= proc[:scale] %>
+  selector:
+    matchLabels:
+      app: <%= proc[:name] %>-proc
+  template:
+    metadata:
+      labels:
+        app: <%= proc[:name] %>-proc
+    spec:
+      containers:
+      - name: <%= proc[:name] %>-proc
+        image: <%= @options[:image] %>:<%= @options[:commit_hash] %>
+        command:
+        - <%= proc[:cmd] %>
+        ports:
+        - containerPort: 3000
+<% end %>

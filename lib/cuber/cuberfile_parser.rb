@@ -33,8 +33,8 @@ module Cuber
       @image = name
     end
 
-    def proc name, replicas = 1
-      @procs << { name: name, replicas: replicas }
+    def proc name, cmd, scale: 1
+      @procs << { name: name, cmd: cmd, scale: scale }
     end
   end
 end
