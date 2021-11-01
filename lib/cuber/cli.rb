@@ -57,6 +57,15 @@ module Cuber
       File.write File.join(path, 'deployment.yml'), content
     end
 
+    def deploy
+      cmd = ['kubectl', 'apply',
+        '--kubeconfig', @options[:kubeconfig],
+        '-n', @options[:app],
+        '-f', '.cuber/kubernetes/deployment.yml',
+        '--prune', '-l', "app.kubernetes.io/name=#{@options[:app]},app.kubernetes.io/managed-by=cuber"]
+      system(*cmd) || abort('Cuber: kubectl apply failed')
+    end
+
     private
 
     def parse_options!
@@ -81,10 +90,12 @@ module Cuber
 
     def validate_options
       abort "Cuber: \"#{@options[:cmd]}\" is not a command" unless @options[:cmd] and respond_to? @options[:cmd]
+      abort 'Cuberfile: app must be present' if @options[:app].to_s.strip.empty?
       abort 'Cuberfile: repo must be present' if @options[:repo].to_s.strip.empty?
       abort 'Cuberfile: dockerfile must be a file' unless @options[:dockerfile].nil? or File.exists? @options[:dockerfile]
       abort 'Cuberfile: ruby version must be present' if @options[:ruby].to_s.strip.empty?
       abort 'Cuberfile: image must be present' if @options[:image].to_s.strip.empty?
+      abort 'Cuberfile: kubeconfig must be present' if @options[:kubeconfig].to_s.strip.empty?
     end
 
     def commit_hash
