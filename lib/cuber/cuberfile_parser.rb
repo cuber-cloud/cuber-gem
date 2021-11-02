@@ -6,6 +6,7 @@ module Cuber
       @dockerfile = nil
       @ruby = nil
       @image = nil
+      @dockerconfig = nil
       @kubeconfig = nil
       @procs = []
     end
@@ -32,6 +33,10 @@ module Cuber
 
     def image name
       @image = name
+    end
+
+    def dockerconfig path
+      @dockerconfig = path
     end
 
     def kubeconfig path

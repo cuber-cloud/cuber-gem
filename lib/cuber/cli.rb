@@ -2,6 +2,7 @@ require 'optparse'
 require 'fileutils'
 require 'open3'
 require 'erb'
+require 'base64'
 
 module Cuber
   class CLI
@@ -49,6 +50,7 @@ module Cuber
 
     def configure
       @options[:commit_hash] = commit_hash
+      @options[:dockerconfigjson] = Base64.strict_encode64 File.read File.expand_path(@options[:dockerconfig] || '~/.docker/config.json')
       template = File.join __dir__, 'templates', 'deployment.yml.erb'
       renderer = ERB.new File.read template
       content = renderer.result binding
@@ -95,6 +97,7 @@ module Cuber
       abort 'Cuberfile: dockerfile must be a file' unless @options[:dockerfile].nil? or File.exists? @options[:dockerfile]
       abort 'Cuberfile: ruby version must be present' if @options[:ruby].to_s.strip.empty?
       abort 'Cuberfile: image must be present' if @options[:image].to_s.strip.empty?
+      abort 'Cuberfile: dockerconfig must be a file' unless @options[:dockerconfig].nil? or File.exists? @options[:dockerconfig]
       abort 'Cuberfile: kubeconfig must be present' if @options[:kubeconfig].to_s.strip.empty?
     end
 
