@@ -31,7 +31,7 @@ metadata:
     app.kubernetes.io/name: <%= @options[:app] %>
     app.kubernetes.io/version: <%= @options[:commit_hash] %>
     app.kubernetes.io/managed-by: cuber
-data:
+stringData:
   <%- @options[:secrets].each do |key, value| -%>
   <%= key %>: <%= value.to_json %>
   <%- end -%>
