@@ -75,6 +75,7 @@ spec:
       containers:
       - name: <%= procname %>-proc
         image: <%= @options[:image] %>:<%= @options[:commit_hash] %>
+        imagePullPolicy: Always
         command: <%= proc[:cmd].shellsplit %>
         ports:
         - containerPort: 3000
