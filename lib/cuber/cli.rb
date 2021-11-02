@@ -3,6 +3,7 @@ require 'fileutils'
 require 'open3'
 require 'erb'
 require 'base64'
+require 'json'
 require 'shellwords'
 
 module Cuber
@@ -100,6 +101,7 @@ module Cuber
       abort 'Cuberfile: image must be present' if @options[:image].to_s.strip.empty?
       abort 'Cuberfile: dockerconfig must be a file' unless @options[:dockerconfig].nil? or File.exists? @options[:dockerconfig]
       abort 'Cuberfile: kubeconfig must be present' if @options[:kubeconfig].to_s.strip.empty?
+      abort 'Cuberfile: env invalid format' if @options.any? { |key, value| key !~ /\A[a-zA-Z_]+[a-zA-Z0-9_]*\z/ }
     end
 
     def commit_hash

@@ -9,6 +9,7 @@ module Cuber
       @dockerconfig = nil
       @kubeconfig = nil
       @procs = []
+      @env = {}
     end
 
     def method_missing m, *args
@@ -45,6 +46,10 @@ module Cuber
 
     def proc name, cmd, scale: 1
       @procs << { name: name, cmd: cmd, scale: scale }
+    end
+
+    def env key, value
+      @env[key] = value
     end
   end
 end
