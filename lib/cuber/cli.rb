@@ -3,6 +3,7 @@ require 'fileutils'
 require 'open3'
 require 'erb'
 require 'base64'
+require 'shellwords'
 
 module Cuber
   class CLI
