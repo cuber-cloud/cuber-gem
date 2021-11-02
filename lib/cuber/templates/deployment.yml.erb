@@ -49,4 +49,6 @@ spec:
         - <%= proc[:cmd] %>
         ports:
         - containerPort: 3000
+      imagePullSecrets:
+      - name: regcred
 <% end %>
