@@ -9,6 +9,7 @@ module Cuber
       @dockerconfig = nil
       @kubeconfig = nil
       @procs = {}
+      @secrets = {}
       @env = {}
     end
 
@@ -48,8 +49,8 @@ module Cuber
       @procs[name] = { cmd: cmd, scale: scale }
     end
 
-    def env key, value
-      @env[key] = value
+    def env key, value, secret: false
+      secret ? (@secrets[key] = value) : (@env[key] = value)
     end
   end
 end

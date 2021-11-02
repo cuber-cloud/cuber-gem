@@ -23,6 +23,21 @@ type: kubernetes.io/dockerconfigjson
 
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+  namespace: <%= @options[:app] %>
+  labels:
+    app.kubernetes.io/name: <%= @options[:app] %>
+    app.kubernetes.io/version: <%= @options[:commit_hash] %>
+    app.kubernetes.io/managed-by: cuber
+data:
+  <% @options[:secrets].each do |key, value| %>
+  <%= key %>: <%= value.to_json %>
+  <% end %>
+
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: env
@@ -66,6 +81,14 @@ spec:
         envFrom:
         - configMapRef:
             name: env
+        env:
+        <% @options[:secrets].each_key do |key| %>
+        - name: <%= key %>
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: <%= key %>
+        <% end %>
       imagePullSecrets:
       - name: regcred
 <% end %>
