@@ -36,12 +36,12 @@ data:
   <%= key %>: <%= value.to_json %>
   <% end %>
 
-<% @options[:procs].each do |proc| %>
+<% @options[:procs].each do |procname, proc| %>
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: <%= proc[:name] %>-deployment
+  name: <%= procname %>-deployment
   namespace: <%= @options[:app] %>
   labels:
     app.kubernetes.io/name: <%= @options[:app] %>
@@ -51,14 +51,14 @@ spec:
   replicas: <%= proc[:scale] %>
   selector:
     matchLabels:
-      app: <%= proc[:name] %>-proc
+      app: <%= procname %>-proc
   template:
     metadata:
       labels:
-        app: <%= proc[:name] %>-proc
+        app: <%= procname %>-proc
     spec:
       containers:
-      - name: <%= proc[:name] %>-proc
+      - name: <%= procname %>-proc
         image: <%= @options[:image] %>:<%= @options[:commit_hash] %>
         command: <%= proc[:cmd].shellsplit %>
         ports:

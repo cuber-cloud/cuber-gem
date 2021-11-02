@@ -8,7 +8,7 @@ module Cuber
       @image = nil
       @dockerconfig = nil
       @kubeconfig = nil
-      @procs = []
+      @procs = {}
       @env = {}
     end
 
@@ -45,7 +45,7 @@ module Cuber
     end
 
     def proc name, cmd, scale: 1
-      @procs << { name: name, cmd: cmd, scale: scale }
+      @procs[name] = { cmd: cmd, scale: scale }
     end
 
     def env key, value
