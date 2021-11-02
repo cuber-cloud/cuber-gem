@@ -1,4 +1,5 @@
 FROM ruby:<%= @options[:ruby] %>
+ARG RAILS_ENV=production
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
@@ -9,6 +10,6 @@ COPY Gemfile Gemfile.lock ./
 RUN gem install bundler
 RUN bundle install
 COPY . .
-RUN rails assets:precompile
+RUN SECRET_KEY_BASE=`bin/rake secret` rails assets:precompile
 EXPOSE 3000
 CMD ["rails", "server", "-b", "0.0.0.0"]
