@@ -101,8 +101,8 @@ module Cuber
       abort 'Cuberfile: image must be present' if @options[:image].to_s.strip.empty?
       abort 'Cuberfile: dockerconfig must be a file' unless @options[:dockerconfig].nil? or File.exists? @options[:dockerconfig]
       abort 'Cuberfile: kubeconfig must be present' if @options[:kubeconfig].to_s.strip.empty?
-      abort 'Cuberfile: proc invalid format' if @options.any? { |key, value| key !~ /\A[a-z]+\z/ }
-      abort 'Cuberfile: env invalid format' if @options.any? { |key, value| key !~ /\A[a-zA-Z_]+[a-zA-Z0-9_]*\z/ }
+      abort 'Cuberfile: proc invalid format' if @options[:procs].any? { |key, value| key !~ /\A[a-z]+\z/ }
+      abort 'Cuberfile: env invalid format' if @options[:env].any? { |key, value| key !~ /\A[a-zA-Z_]+[a-zA-Z0-9_]*\z/ }
     end
 
     def commit_hash
