@@ -51,3 +51,23 @@ spec:
       imagePullSecrets:
       - name: regcred
 <% end %>
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: load-balancer
+  namespace: <%= @options[:app] %>
+  labels:
+    app.kubernetes.io/name: <%= @options[:app] %>
+    app.kubernetes.io/version: <%= @options[:commit_hash] %>
+    app.kubernetes.io/managed-by: cuber
+spec:
+  type: LoadBalancer
+  selector:
+    app: web-proc
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 3000
