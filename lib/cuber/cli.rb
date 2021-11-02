@@ -54,7 +54,7 @@ module Cuber
       @options[:commit_hash] = commit_hash
       @options[:dockerconfigjson] = Base64.strict_encode64 File.read File.expand_path(@options[:dockerconfig] || '~/.docker/config.json')
       template = File.join __dir__, 'templates', 'deployment.yml.erb'
-      renderer = ERB.new File.read template
+      renderer = ERB.new File.read(template), trim_mode: '-'
       content = renderer.result binding
       path = '.cuber/kubernetes'
       FileUtils.mkdir_p path

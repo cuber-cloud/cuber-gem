@@ -32,9 +32,9 @@ metadata:
     app.kubernetes.io/version: <%= @options[:commit_hash] %>
     app.kubernetes.io/managed-by: cuber
 data:
-  <% @options[:secrets].each do |key, value| %>
+  <%- @options[:secrets].each do |key, value| -%>
   <%= key %>: <%= value.to_json %>
-  <% end %>
+  <%- end -%>
 
 ---
 apiVersion: v1
@@ -47,11 +47,11 @@ metadata:
     app.kubernetes.io/version: <%= @options[:commit_hash] %>
     app.kubernetes.io/managed-by: cuber
 data:
-  <% @options[:env].each do |key, value| %>
+  <%- @options[:env].each do |key, value| -%>
   <%= key %>: <%= value.to_json %>
-  <% end %>
+  <%- end -%>
 
-<% @options[:procs].each do |procname, proc| %>
+<%- @options[:procs].each do |procname, proc| -%>
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -82,16 +82,16 @@ spec:
         - configMapRef:
             name: env
         env:
-        <% @options[:secrets].each_key do |key| %>
+        <%- @options[:secrets].each_key do |key| -%>
         - name: <%= key %>
           valueFrom:
             secretKeyRef:
               name: app-secrets
               key: <%= key %>
-        <% end %>
+        <%- end -%>
       imagePullSecrets:
       - name: regcred
-<% end %>
+<%- end -%>
 
 ---
 apiVersion: v1
