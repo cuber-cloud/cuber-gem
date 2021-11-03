@@ -22,6 +22,38 @@ module Cuber
       puts "Cuber v#{Cuber::VERSION}"
     end
 
+    def info
+      json = kubeget 'namespace', @options[:app]
+      puts "App: #{json['metadata']['labels']['app.kubernetes.io/name']}"
+      puts "Version: #{json['metadata']['labels']['app.kubernetes.io/version']}"
+
+      json = kubeget 'service', 'load-balancer'
+      puts "Public IP: #{json['status']['loadBalancer']['ingress'][0]['ip']}"
+
+      puts "Env:"
+
+      json = kubeget 'configmap', 'env'
+      json['data'].each do |key, value|
+        puts "  #{key}=#{value}"
+      end
+
+      json = kubeget 'secrets', 'app-secrets'
+      json['data'].each do |key, value|
+        puts "  #{key}=#{Base64.decode64(value)[0...5] + '***'}"
+      end
+
+      puts "Proc:"
+
+      json = kubeget 'deployments'
+      json['items'].each do |proc|
+        name = proc['metadata']['name'].delete_suffix('-deployment')
+        command = proc['spec']['template']['spec']['containers'][0]['command'].shelljoin
+        available = proc['status']['availableReplicas']
+        scale = proc['spec']['replicas']
+        puts "  #{name}: #{command} (#{available}/#{scale})"
+      end
+    end
+
     def checkout
       path = '.cuber/repo'
       FileUtils.mkdir_p path
@@ -109,6 +141,13 @@ module Cuber
       out, status = Open3.capture2 'git', 'rev-parse', 'HEAD', chdir: '.cuber/repo'
       abort 'Cuber: cannot get commit hash' unless status.success?
       out.strip
+    end
+
+    def kubeget type, name = nil
+      cmd = ['kubectl', 'get', type, name, '-o', 'json', '--kubeconfig', @options[:kubeconfig], '-n', @options[:app]].compact
+      out, status = Open3.capture2 *cmd
+      abort 'Cuber: kubectl get failed' unless status.success?
+      JSON.parse(out)
     end
 
   end
