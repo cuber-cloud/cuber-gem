@@ -63,6 +63,7 @@ metadata:
     app.kubernetes.io/version: <%= @options[:commit_hash] %>
     app.kubernetes.io/managed-by: cuber
 spec:
+  revisionHistoryLimit: 0
   replicas: <%= proc[:scale] %>
   selector:
     matchLabels:
