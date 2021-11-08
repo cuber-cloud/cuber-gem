@@ -54,6 +54,17 @@ module Cuber
       end
     end
 
+    def deploy
+      checkout
+      dockerfile
+      build
+      push
+      configure
+      apply
+    end
+
+    private
+
     def checkout
       path = '.cuber/repo'
       FileUtils.mkdir_p path
@@ -93,7 +104,7 @@ module Cuber
       File.write File.join(path, 'deployment.yml'), content
     end
 
-    def deploy
+    def apply
       cmd = ['kubectl', 'apply',
         '--kubeconfig', @options[:kubeconfig],
         '-n', @options[:app],
@@ -101,8 +112,6 @@ module Cuber
         '--prune', '-l', "app.kubernetes.io/name=#{@options[:app]},app.kubernetes.io/managed-by=cuber"]
       system(*cmd) || abort('Cuber: kubectl apply failed')
     end
-
-    private
 
     def parse_options!
       OptionParser.new do |opts|
