@@ -73,6 +73,7 @@ module Cuber
       push
       configure
       apply
+      rollout
     end
 
     private
@@ -128,6 +129,17 @@ module Cuber
         '-f', '.cuber/kubernetes/deployment.yml',
         '--prune', '-l', "app.kubernetes.io/name=#{@options[:app]},app.kubernetes.io/managed-by=cuber"]
       system(*cmd) || abort('Cuber: kubectl apply failed')
+    end
+
+    def rollout
+      print_step 'Verifying deployment status'
+      @options[:procs].each_key do |procname|
+        cmd = ['kubectl', 'rollout', 'status',
+          '--kubeconfig', @options[:kubeconfig],
+          '-n', @options[:app],
+          "deployment/#{procname}-deployment"]
+        system(*cmd) || abort('Cuber: kubectl rollout status failed')
+      end
     end
 
     def parse_options!
