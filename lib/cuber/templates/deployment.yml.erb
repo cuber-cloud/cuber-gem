@@ -83,14 +83,8 @@ spec:
         envFrom:
         - configMapRef:
             name: env
-        env:
-        <%- @options[:secrets].each_key do |key| -%>
-        - name: <%= key %>
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: <%= key %>
-        <%- end -%>
+        - secretRef:
+            name: app-secrets
       imagePullSecrets:
       - name: regcred
 <%- end -%>
