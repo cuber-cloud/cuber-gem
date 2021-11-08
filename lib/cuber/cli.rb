@@ -88,7 +88,7 @@ module Cuber
       print_step 'Building image from Dockerfile'
       dockerfile = @options[:dockerfile] || 'Dockerfile'
       tag = "#{@options[:image]}:#{commit_hash}"
-      system('docker', 'build', '-f', dockerfile, '-t', tag, '.', chdir: '.cuber/repo') || abort('Cuber: docker build failed')
+      system('docker', 'build', '--pull', '--no-cache', '-f', dockerfile, '-t', tag, '.', chdir: '.cuber/repo') || abort('Cuber: docker build failed')
     end
 
     def push
