@@ -5,6 +5,7 @@ require 'erb'
 require 'base64'
 require 'json'
 require 'shellwords'
+require 'time'
 
 module Cuber
   class CLI
@@ -66,6 +67,7 @@ module Cuber
 
     def deploy
       checkout
+      set_release_name
       dockerfile
       build
       push
@@ -97,19 +99,18 @@ module Cuber
     def build
       print_step 'Building image from Dockerfile'
       dockerfile = @options[:dockerfile] || 'Dockerfile'
-      tag = "#{@options[:image]}:#{commit_hash}"
+      tag = "#{@options[:image]}:#{@options[:release]}"
       system('docker', 'build', '--pull', '--no-cache', '-f', dockerfile, '-t', tag, '.', chdir: '.cuber/repo') || abort('Cuber: docker build failed')
     end
 
     def push
       print_step 'Pushing image to Docker registry'
-      tag = "#{@options[:image]}:#{commit_hash}"
+      tag = "#{@options[:image]}:#{@options[:release]}"
       system('docker', 'push', tag) || abort('Cuber: docker push failed')
     end
 
     def configure
       print_step 'Generating Kubernetes configuration'
-      @options[:commit_hash] = commit_hash
       @options[:dockerconfigjson] = Base64.strict_encode64 File.read File.expand_path(@options[:dockerconfig] || '~/.docker/config.json')
       template = File.join __dir__, 'templates', 'deployment.yml.erb'
       renderer = ERB.new File.read(template), trim_mode: '-'
@@ -166,6 +167,10 @@ module Cuber
       out, status = Open3.capture2 'git', 'rev-parse', 'HEAD', chdir: '.cuber/repo'
       abort 'Cuber: cannot get commit hash' unless status.success?
       out.strip
+    end
+
+    def set_release_name
+      @options[:release] = "#{commit_hash}-#{Time.now.utc.iso8601.delete('^0-9')}"
     end
 
     def kubeget type, name = nil
