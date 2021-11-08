@@ -66,6 +66,7 @@ module Cuber
     private
 
     def checkout
+      print_step 'Cloning Git repository'
       path = '.cuber/repo'
       FileUtils.mkdir_p path
       FileUtils.rm_rf path, secure: true
@@ -73,6 +74,7 @@ module Cuber
     end
 
     def dockerfile
+      print_step 'Generating Dockerfile'
       return if @options[:dockerfile]
       template = File.join __dir__, 'templates', 'Dockerfile.erb'
       renderer = ERB.new File.read template
@@ -83,17 +85,20 @@ module Cuber
     end
 
     def build
+      print_step 'Building image from Dockerfile'
       dockerfile = @options[:dockerfile] || 'Dockerfile'
       tag = "#{@options[:image]}:#{commit_hash}"
       system('docker', 'build', '-f', dockerfile, '-t', tag, '.', chdir: '.cuber/repo') || abort('Cuber: docker build failed')
     end
 
     def push
+      print_step 'Pushing image to Docker registry'
       tag = "#{@options[:image]}:#{commit_hash}"
       system('docker', 'push', tag) || abort('Cuber: docker push failed')
     end
 
     def configure
+      print_step 'Generating Kubernetes configuration'
       @options[:commit_hash] = commit_hash
       @options[:dockerconfigjson] = Base64.strict_encode64 File.read File.expand_path(@options[:dockerconfig] || '~/.docker/config.json')
       template = File.join __dir__, 'templates', 'deployment.yml.erb'
@@ -105,6 +110,7 @@ module Cuber
     end
 
     def apply
+      print_step 'Applying configuration to Kubernetes cluster'
       cmd = ['kubectl', 'apply',
         '--kubeconfig', @options[:kubeconfig],
         '-n', @options[:app],
@@ -157,6 +163,11 @@ module Cuber
       out, status = Open3.capture2 *cmd
       abort 'Cuber: kubectl get failed' unless status.success?
       JSON.parse(out)
+    end
+
+    def print_step desc
+      puts
+      puts "\e[34m-----> #{desc}\e[0m"
     end
 
   end
