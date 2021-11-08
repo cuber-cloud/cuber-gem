@@ -88,6 +88,12 @@ spec:
             name: env
         - secretRef:
             name: app-secrets
+        <%- if procname.to_s == 'web' -%>
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+        <%- end -%>
       imagePullSecrets:
       - name: regcred
 <%- end -%>
