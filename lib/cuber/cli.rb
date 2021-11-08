@@ -54,6 +54,16 @@ module Cuber
       end
     end
 
+    def logs
+      cmd = ['kubectl', 'logs',
+        '--kubeconfig', @options[:kubeconfig],
+        '-n', @options[:app],
+        '-l', "app.kubernetes.io/name=#{@options[:app]}",
+        '--tail', '20'
+      ]
+      system(*cmd) || abort('Cuber: kubectl logs failed')
+    end
+
     def deploy
       checkout
       dockerfile
