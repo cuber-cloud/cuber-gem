@@ -164,7 +164,7 @@ module Cuber
     end
 
     def commit_hash
-      out, status = Open3.capture2 'git', 'rev-parse', 'HEAD', chdir: '.cuber/repo'
+      out, status = Open3.capture2 'git', 'rev-parse', '--short', 'HEAD', chdir: '.cuber/repo'
       abort 'Cuber: cannot get commit hash' unless status.success?
       out.strip
     end
