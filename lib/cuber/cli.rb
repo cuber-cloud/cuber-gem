@@ -60,8 +60,7 @@ module Cuber
         '--kubeconfig', @options[:kubeconfig],
         '-n', @options[:app],
         '-l', "app.kubernetes.io/name=#{@options[:app]}",
-        '--tail', '20'
-      ]
+        '--tail', '100']
       system(*cmd) || abort('Cuber: kubectl logs failed')
     end
 
