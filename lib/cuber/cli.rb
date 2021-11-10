@@ -64,6 +64,50 @@ module Cuber
       system(*cmd) || abort('Cuber: kubectl logs failed')
     end
 
+    def sh
+      @options[:shell] = "shell-#{Time.now.utc.iso8601.delete('^0-9')}"
+
+      json = kubeget 'namespace', @options[:app]
+      @options[:app] = json['metadata']['labels']['app.kubernetes.io/name']
+      @options[:release] = json['metadata']['labels']['app.kubernetes.io/version']
+      @options[:image] = json['metadata']['annotations']['image']
+
+      template = File.join __dir__, 'templates', 'shell.yml.erb'
+      renderer = ERB.new File.read(template), trim_mode: '-'
+      content = renderer.result binding
+      path = ".cuber/kubernetes/#{@options[:shell]}.yml"
+      FileUtils.mkdir_p File.dirname path
+      File.write path, content
+      cmd = ['kubectl', 'apply',
+        '--kubeconfig', @options[:kubeconfig],
+        '-n', @options[:app],
+        '-f', path]
+      system(*cmd) || abort('Cuber: kubectl apply failed')
+
+      cmd = ['kubectl', 'wait',
+        '--kubeconfig', @options[:kubeconfig],
+        '-n', @options[:app],
+        '--for', 'condition=ready',
+        "pod/#{@options[:shell]}"]
+      system(*cmd) || abort('Cuber: kubectl wait failed')
+
+      cmd = ['kubectl', 'exec',
+        '--kubeconfig', @options[:kubeconfig],
+        '-n', @options[:app],
+        '-it', @options[:shell],
+        '--', '/bin/sh']
+      system(*cmd) || abort('Cuber: kubectl exec failed')
+
+      cmd = ['kubectl', 'delete',
+        '--kubeconfig', @options[:kubeconfig],
+        '-n', @options[:app],
+        'pod', @options[:shell],
+        '--wait=false']
+      system(*cmd) || abort('Cuber: kubectl delete failed')
+
+      File.delete path
+    end
+
     def deploy
       checkout
       set_release_name

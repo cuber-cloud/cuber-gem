@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: <%= @options[:shell] %>
+  labels:
+    app.kubernetes.io/name: <%= @options[:app] %>
+    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/managed-by: cuber
+spec:
+  containers:
+  - name: shell-proc
+    image: <%= @options[:image] %>:<%= @options[:release] %>
+    imagePullPolicy: Always
+    command: ["sleep"]
+    args: ["infinity"]
+    envFrom:
+    - configMapRef:
+        name: env
+    - secretRef:
+        name: app-secrets
+  imagePullSecrets:
+  - name: regcred
