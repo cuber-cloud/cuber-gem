@@ -56,12 +56,9 @@ module Cuber
     end
 
     def logs
-      cmd = ['kubectl', 'logs',
-        '--kubeconfig', @options[:kubeconfig],
-        '-n', @options[:app],
+      kubectl 'logs',
         '-l', "app.kubernetes.io/name=#{@options[:app]}",
-        '--tail', '100']
-      system(*cmd) || abort('Cuber: kubectl logs failed')
+        '--tail', '100'
     end
 
     def sh
@@ -78,32 +75,11 @@ module Cuber
       path = ".cuber/kubernetes/#{@options[:shell]}.yml"
       FileUtils.mkdir_p File.dirname path
       File.write path, content
-      cmd = ['kubectl', 'apply',
-        '--kubeconfig', @options[:kubeconfig],
-        '-n', @options[:app],
-        '-f', path]
-      system(*cmd) || abort('Cuber: kubectl apply failed')
 
-      cmd = ['kubectl', 'wait',
-        '--kubeconfig', @options[:kubeconfig],
-        '-n', @options[:app],
-        '--for', 'condition=ready',
-        "pod/#{@options[:shell]}"]
-      system(*cmd) || abort('Cuber: kubectl wait failed')
-
-      cmd = ['kubectl', 'exec',
-        '--kubeconfig', @options[:kubeconfig],
-        '-n', @options[:app],
-        '-it', @options[:shell],
-        '--', '/bin/sh']
-      system(*cmd) || abort('Cuber: kubectl exec failed')
-
-      cmd = ['kubectl', 'delete',
-        '--kubeconfig', @options[:kubeconfig],
-        '-n', @options[:app],
-        'pod', @options[:shell],
-        '--wait=false']
-      system(*cmd) || abort('Cuber: kubectl delete failed')
+      kubectl 'apply', '-f', path
+      kubectl 'wait', '--for', 'condition=ready', "pod/#{@options[:shell]}"
+      kubectl 'exec', '-it', @options[:shell], '--', '/bin/sh'
+      kubectl 'delete', 'pod', @options[:shell], '--wait=false'
 
       File.delete path
     end
@@ -166,22 +142,15 @@ module Cuber
 
     def apply
       print_step 'Applying configuration to Kubernetes cluster'
-      cmd = ['kubectl', 'apply',
-        '--kubeconfig', @options[:kubeconfig],
-        '-n', @options[:app],
+      kubectl 'apply',
         '-f', '.cuber/kubernetes/deployment.yml',
-        '--prune', '-l', "app.kubernetes.io/name=#{@options[:app]},app.kubernetes.io/managed-by=cuber"]
-      system(*cmd) || abort('Cuber: kubectl apply failed')
+        '--prune', '-l', "app.kubernetes.io/name=#{@options[:app]},app.kubernetes.io/managed-by=cuber"
     end
 
     def rollout
       print_step 'Verifying deployment status'
       @options[:procs].each_key do |procname|
-        cmd = ['kubectl', 'rollout', 'status',
-          '--kubeconfig', @options[:kubeconfig],
-          '-n', @options[:app],
-          "deployment/#{procname}-deployment"]
-        system(*cmd) || abort('Cuber: kubectl rollout status failed')
+        kubectl 'rollout', 'status', "deployment/#{procname}-deployment"
       end
     end
 
@@ -226,6 +195,11 @@ module Cuber
 
     def set_release_name
       @options[:release] = "#{commit_hash}-#{Time.now.utc.iso8601.delete('^0-9')}"
+    end
+
+    def kubectl *args
+      cmd = ['kubectl', '--kubeconfig', @options[:kubeconfig], '-n', @options[:app]] + args
+      system(*cmd) || abort("Cuber: #{cmd} failed")
     end
 
     def kubeget type, name = nil
