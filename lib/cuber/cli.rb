@@ -14,7 +14,7 @@ module Cuber
       @options = {}
       parse_options!
       parse_cuberfile
-      @options[:cmd] = ARGV.first&.to_sym
+      @options[:cmd] = ARGV.shift&.to_sym
       validate_options
       public_send @options[:cmd]
     end
@@ -78,6 +78,29 @@ module Cuber
       kubectl 'delete', 'pod', @options[:shell], '--wait=false'
 
       File.delete path
+    end
+
+    def run
+      @options[:job] = "job-#{Time.now.utc.iso8601.delete('^0-9')}"
+      @options[:job_cmd] = ARGV
+
+      json = kubeget 'namespace', @options[:app]
+      @options[:app] = json['metadata']['labels']['app.kubernetes.io/name']
+      @options[:release] = json['metadata']['labels']['app.kubernetes.io/version']
+      @options[:image] = json['metadata']['annotations']['image']
+
+      path = ".cuber/kubernetes/#{@options[:job]}.yml"
+      render 'job.yml', path
+      kubectl 'apply', '-f', path
+      File.delete path
+
+      loop do
+        json = kubeget 'job', @options[:job]
+        break if json['status']['active'].to_i.zero?
+        sleep 1
+      end
+
+      kubectl 'logs', '-l', "job-name=#{@options[:job]}", '--tail=-1'
     end
 
     def deploy
