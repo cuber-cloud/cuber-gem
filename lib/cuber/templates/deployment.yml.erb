@@ -6,6 +6,8 @@ metadata:
     app.kubernetes.io/name: <%= @options[:app] %>
     app.kubernetes.io/version: <%= @options[:release] %>
     app.kubernetes.io/managed-by: cuber
+  annotations:
+    image: <%= @options[:image] %>
 
 ---
 apiVersion: v1
