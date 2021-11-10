@@ -69,12 +69,8 @@ module Cuber
       @options[:release] = json['metadata']['labels']['app.kubernetes.io/version']
       @options[:image] = json['metadata']['annotations']['image']
 
-      template = File.join __dir__, 'templates', 'shell.yml.erb'
-      renderer = ERB.new File.read(template), trim_mode: '-'
-      content = renderer.result binding
       path = ".cuber/kubernetes/#{@options[:shell]}.yml"
-      FileUtils.mkdir_p File.dirname path
-      File.write path, content
+      render 'shell.yml', path
 
       kubectl 'apply', '-f', path
       kubectl 'wait', '--for', 'condition=ready', "pod/#{@options[:shell]}"
@@ -108,12 +104,7 @@ module Cuber
     def dockerfile
       print_step 'Generating Dockerfile'
       return if @options[:dockerfile]
-      template = File.join __dir__, 'templates', 'Dockerfile.erb'
-      renderer = ERB.new File.read template
-      content = renderer.result binding
-      path = '.cuber/repo'
-      FileUtils.mkdir_p path
-      File.write File.join(path, 'Dockerfile'), content
+      render 'Dockerfile', '.cuber/repo/Dockerfile'
     end
 
     def build
@@ -132,12 +123,7 @@ module Cuber
     def configure
       print_step 'Generating Kubernetes configuration'
       @options[:dockerconfigjson] = Base64.strict_encode64 File.read File.expand_path(@options[:dockerconfig] || '~/.docker/config.json')
-      template = File.join __dir__, 'templates', 'deployment.yml.erb'
-      renderer = ERB.new File.read(template), trim_mode: '-'
-      content = renderer.result binding
-      path = '.cuber/kubernetes'
-      FileUtils.mkdir_p path
-      File.write File.join(path, 'deployment.yml'), content
+      render 'deployment.yml', '.cuber/kubernetes/deployment.yml'
     end
 
     def apply
@@ -207,6 +193,14 @@ module Cuber
       out, status = Open3.capture2 *cmd
       abort 'Cuber: kubectl get failed' unless status.success?
       JSON.parse(out)
+    end
+
+    def render template, target_file
+      template = File.join __dir__, 'templates', "#{template}.erb"
+      renderer = ERB.new File.read(template), trim_mode: '-'
+      content = renderer.result binding
+      FileUtils.mkdir_p File.dirname target_file
+      File.write target_file, content
     end
 
     def print_step desc
