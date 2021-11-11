@@ -68,40 +68,6 @@ module Cuber
       kubeexec command
     end
 
-    def sh
-      set_current_release
-      kubeexec '/bin/sh'
-    end
-
-    def run
-      set_current_release
-      @options[:job] = "job-#{Time.now.utc.iso8601.delete('^0-9')}"
-      @options[:job_cmd] = ARGV
-      path = ".cuber/kubernetes/#{@options[:job]}.yml"
-      render 'job.yml', path
-      kubectl 'apply', '-f', path
-      File.delete path
-      loop do
-        json = kubeget 'job', @options[:job]
-        break if json['status']['active'].to_i.zero?
-        sleep 1
-      end
-      kubectl 'logs', '-l', "job-name=#{@options[:job]}", '--tail=-1'
-    end
-
-    def runner
-      set_current_release
-      @options[:runner] = "runner-#{Time.now.utc.iso8601.delete('^0-9')}"
-      @options[:runner_cmd] = ARGV.one? ? ARGV.first.shellsplit : ARGV
-      pod = render 'runner.yml'
-      kubectl 'run', @options[:runner],
-        '-i', '--tty',
-        '--image', "#{@options[:image]}:#{@options[:release]}",
-        '--overrides', (JSON.dump YAML.safe_load pod),
-        '--restart', 'Never',
-        '--rm'
-    end
-
     def deploy
       checkout
       set_release_name
