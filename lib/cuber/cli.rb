@@ -218,10 +218,11 @@ module Cuber
       JSON.parse(out)
     end
 
-    def render template, target_file
+    def render template, target_file = nil
       template = File.join __dir__, 'templates', "#{template}.erb"
       renderer = ERB.new File.read(template), trim_mode: '-'
       content = renderer.result binding
+      return content unless target_file
       FileUtils.mkdir_p File.dirname target_file
       File.write target_file, content
     end
