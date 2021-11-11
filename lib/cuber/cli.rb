@@ -208,7 +208,7 @@ module Cuber
 
     def kubectl *args
       cmd = ['kubectl', '--kubeconfig', @options[:kubeconfig], '-n', @options[:app]] + args
-      system(*cmd) || abort("Cuber: #{cmd} failed")
+      system(*cmd) || abort("Cuber: \"#{cmd.shelljoin}\" failed")
     end
 
     def kubeget type, name = nil
