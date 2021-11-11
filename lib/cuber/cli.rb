@@ -3,6 +3,7 @@ require 'fileutils'
 require 'open3'
 require 'erb'
 require 'base64'
+require 'yaml'
 require 'json'
 require 'shellwords'
 require 'time'
@@ -101,6 +102,25 @@ module Cuber
       end
 
       kubectl 'logs', '-l', "job-name=#{@options[:job]}", '--tail=-1'
+    end
+
+    def runner
+      @options[:runner] = "runner-#{Time.now.utc.iso8601.delete('^0-9')}"
+      @options[:runner_cmd] = ARGV.one? ? ARGV.first.shellsplit : ARGV
+
+      json = kubeget 'namespace', @options[:app]
+      @options[:app] = json['metadata']['labels']['app.kubernetes.io/name']
+      @options[:release] = json['metadata']['labels']['app.kubernetes.io/version']
+      @options[:image] = json['metadata']['annotations']['image']
+
+      pod = render 'runner.yml'
+
+      kubectl 'run', @options[:runner],
+        '-i', '--tty',
+        '--image', "#{@options[:image]}:#{@options[:release]}",
+        '--overrides', (JSON.dump YAML.safe_load pod),
+        '--restart', 'Never',
+        '--rm'
     end
 
     def deploy
