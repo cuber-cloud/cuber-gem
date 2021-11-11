@@ -63,58 +63,38 @@ module Cuber
     end
 
     def sh
+      set_current_release
       @options[:shell] = "shell-#{Time.now.utc.iso8601.delete('^0-9')}"
-
-      json = kubeget 'namespace', @options[:app]
-      @options[:app] = json['metadata']['labels']['app.kubernetes.io/name']
-      @options[:release] = json['metadata']['labels']['app.kubernetes.io/version']
-      @options[:image] = json['metadata']['annotations']['image']
-
       path = ".cuber/kubernetes/#{@options[:shell]}.yml"
       render 'shell.yml', path
-
       kubectl 'apply', '-f', path
       kubectl 'wait', '--for', 'condition=ready', "pod/#{@options[:shell]}"
       kubectl 'exec', '-it', @options[:shell], '--', '/bin/sh'
       kubectl 'delete', 'pod', @options[:shell], '--wait=false'
-
       File.delete path
     end
 
     def run
+      set_current_release
       @options[:job] = "job-#{Time.now.utc.iso8601.delete('^0-9')}"
       @options[:job_cmd] = ARGV
-
-      json = kubeget 'namespace', @options[:app]
-      @options[:app] = json['metadata']['labels']['app.kubernetes.io/name']
-      @options[:release] = json['metadata']['labels']['app.kubernetes.io/version']
-      @options[:image] = json['metadata']['annotations']['image']
-
       path = ".cuber/kubernetes/#{@options[:job]}.yml"
       render 'job.yml', path
       kubectl 'apply', '-f', path
       File.delete path
-
       loop do
         json = kubeget 'job', @options[:job]
         break if json['status']['active'].to_i.zero?
         sleep 1
       end
-
       kubectl 'logs', '-l', "job-name=#{@options[:job]}", '--tail=-1'
     end
 
     def runner
+      set_current_release
       @options[:runner] = "runner-#{Time.now.utc.iso8601.delete('^0-9')}"
       @options[:runner_cmd] = ARGV.one? ? ARGV.first.shellsplit : ARGV
-
-      json = kubeget 'namespace', @options[:app]
-      @options[:app] = json['metadata']['labels']['app.kubernetes.io/name']
-      @options[:release] = json['metadata']['labels']['app.kubernetes.io/version']
-      @options[:image] = json['metadata']['annotations']['image']
-
       pod = render 'runner.yml'
-
       kubectl 'run', @options[:runner],
         '-i', '--tty',
         '--image', "#{@options[:image]}:#{@options[:release]}",
@@ -224,6 +204,13 @@ module Cuber
 
     def set_release_name
       @options[:release] = "#{commit_hash}-#{Time.now.utc.iso8601.delete('^0-9')}"
+    end
+
+    def set_current_release
+      json = kubeget 'namespace', @options[:app]
+      @options[:app] = json['metadata']['labels']['app.kubernetes.io/name']
+      @options[:release] = json['metadata']['labels']['app.kubernetes.io/version']
+      @options[:image] = json['metadata']['annotations']['image']
     end
 
     def kubectl *args
