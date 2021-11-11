@@ -62,7 +62,7 @@ module Cuber
         '--tail', '100'
     end
 
-    def exec
+    def run
       set_current_release
       command = ARGV.one? ? ARGV.first : ARGV.shelljoin
       kubeexec command
