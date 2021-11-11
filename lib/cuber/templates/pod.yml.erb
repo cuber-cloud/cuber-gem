@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: <%= @options[:shell] %>
+  name: <%= @options[:pod] %>
   namespace: <%= @options[:app] %>
   labels:
     app.kubernetes.io/name: <%= @options[:app] %>
@@ -9,11 +9,10 @@ metadata:
     app.kubernetes.io/managed-by: cuber
 spec:
   containers:
-  - name: shell-proc
+  - name: pod-proc
     image: <%= @options[:image] %>:<%= @options[:release] %>
     imagePullPolicy: Always
-    command: ["sleep"]
-    args: ["infinity"]
+    command: ["sleep", "infinity"]
     envFrom:
     - configMapRef:
         name: env

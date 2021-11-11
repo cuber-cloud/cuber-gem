@@ -62,16 +62,15 @@ module Cuber
         '--tail', '100'
     end
 
+    def exec
+      set_current_release
+      command = ARGV.one? ? ARGV.first : ARGV.shelljoin
+      kubeexec command
+    end
+
     def sh
       set_current_release
-      @options[:shell] = "shell-#{Time.now.utc.iso8601.delete('^0-9')}"
-      path = ".cuber/kubernetes/#{@options[:shell]}.yml"
-      render 'shell.yml', path
-      kubectl 'apply', '-f', path
-      kubectl 'wait', '--for', 'condition=ready', "pod/#{@options[:shell]}"
-      kubectl 'exec', '-it', @options[:shell], '--', '/bin/sh'
-      kubectl 'delete', 'pod', @options[:shell], '--wait=false'
-      File.delete path
+      kubeexec '/bin/sh'
     end
 
     def run
@@ -223,6 +222,17 @@ module Cuber
       out, status = Open3.capture2 *cmd
       abort 'Cuber: kubectl get failed' unless status.success?
       JSON.parse(out)
+    end
+
+    def kubeexec command
+      @options[:pod] = "pod-#{command.downcase.gsub(/[^a-z0-9]+/, '-')}-#{Time.now.utc.iso8601.delete('^0-9')}"
+      path = ".cuber/kubernetes/#{@options[:pod]}.yml"
+      render 'pod.yml', path
+      kubectl 'apply', '-f', path
+      kubectl 'wait', '--for', 'condition=ready', "pod/#{@options[:pod]}"
+      kubectl 'exec', '-it', @options[:pod], '--', *command.shellsplit
+      kubectl 'delete', 'pod', @options[:pod], '--wait=false'
+      File.delete path
     end
 
     def render template, target_file = nil
