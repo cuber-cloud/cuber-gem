@@ -51,8 +51,10 @@ module Cuber
         name = proc['metadata']['name'].delete_suffix('-deployment')
         command = proc['spec']['template']['spec']['containers'][0]['command'].shelljoin
         available = proc['status']['availableReplicas']
+        updated = proc['status']['updatedReplicas']
+        replicas = proc['status']['replicas']
         scale = proc['spec']['replicas']
-        puts "  #{name}: #{command} (#{available}/#{scale})"
+        puts "  #{name}: #{command} (#{available}/#{scale}) #{'OUT-OF-DATE' if replicas - updated > 0}"
       end
 
       puts "Issues:"
@@ -68,7 +70,7 @@ module Cuber
           puts "  #{name}: #{pod_status}"
         elsif !container_ready
           issues_count += 1
-          container_status = pod['status']['containerStatuses'][0]['state']
+          container_status = pod['status']['containerStatuses'][0]['state'].values.first['reason']
           puts "  #{name}: #{container_status}"
         end
       end
