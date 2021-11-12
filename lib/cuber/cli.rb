@@ -26,6 +26,9 @@ module Cuber
 
     def info
       json = kubeget 'namespace', @options[:app]
+
+      abort 'Cuber: app not found' if json.dig('metadata', 'labels', 'app.kubernetes.io/managed-by') != 'cuber'
+
       puts "App: #{json['metadata']['labels']['app.kubernetes.io/name']}"
       puts "Version: #{json['metadata']['labels']['app.kubernetes.io/version']}"
 
