@@ -6,6 +6,7 @@ module Cuber
       @dockerfile = nil
       @ruby = nil
       @image = nil
+      @cache = nil
       @dockerconfig = nil
       @kubeconfig = nil
       @procs = {}
@@ -35,6 +36,10 @@ module Cuber
 
     def image name
       @image = name
+    end
+
+    def cache enabled
+      @cache = enabled
     end
 
     def dockerconfig path

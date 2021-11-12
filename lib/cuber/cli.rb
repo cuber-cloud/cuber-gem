@@ -128,7 +128,10 @@ module Cuber
       print_step 'Building image from Dockerfile'
       dockerfile = @options[:dockerfile] || 'Dockerfile'
       tag = "#{@options[:image]}:#{@options[:release]}"
-      system('docker', 'build', '--progress', 'plain', '--pull', '--no-cache', '-f', dockerfile, '-t', tag, '.', chdir: '.cuber/repo') || abort('Cuber: docker build failed')
+      cmd = ['docker', 'build']
+      cmd += ['--pull', '--no-cache'] if @options[:cache] == false
+      cmd += ['--progress', 'plain', '-f', dockerfile, '-t', tag, '.']
+      system(*cmd, chdir: '.cuber/repo') || abort('Cuber: docker build failed')
     end
 
     def push
