@@ -58,7 +58,7 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: <%= procname %>-deployment
+  name: <%= procname %>
   namespace: <%= @options[:app] %>
   labels:
     app.kubernetes.io/name: <%= @options[:app] %>

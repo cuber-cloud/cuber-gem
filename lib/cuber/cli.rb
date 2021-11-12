@@ -48,7 +48,7 @@ module Cuber
 
       json = kubeget 'deployments'
       json['items'].each do |proc|
-        name = proc['metadata']['name'].delete_suffix('-deployment')
+        name = proc['metadata']['name']
         command = proc['spec']['template']['spec']['containers'][0]['command'].shelljoin
         available = proc['status']['availableReplicas']
         updated = proc['status']['updatedReplicas']
@@ -149,7 +149,7 @@ module Cuber
     def rollout
       print_step 'Verifying deployment status'
       @options[:procs].each_key do |procname|
-        kubectl 'rollout', 'status', "deployment/#{procname}-deployment"
+        kubectl 'rollout', 'status', "deployment/#{procname}"
       end
     end
 
