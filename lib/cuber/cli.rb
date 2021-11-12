@@ -62,6 +62,10 @@ module Cuber
         '--tail', '100'
     end
 
+    def restart
+      kubectl 'rollout', 'restart', 'deploy'
+    end
+
     def run
       set_current_release
       command = ARGV.one? ? ARGV.first : ARGV.shelljoin
