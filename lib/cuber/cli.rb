@@ -78,9 +78,10 @@ module Cuber
     end
 
     def logs
-      kubectl 'logs',
-        '-l', "app.kubernetes.io/name=#{@options[:app]}",
-        '--tail', '100'
+      pod = ARGV.first
+      cmd = ['logs', '--tail', '100']
+      cmd += pod ? [pod] : ['-l', "app.kubernetes.io/name=#{@options[:app]}"]
+      kubectl *cmd
     end
 
     def restart
