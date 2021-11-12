@@ -35,12 +35,12 @@ module Cuber
       puts "Env:"
 
       json = kubeget 'configmap', 'env'
-      json['data'].each do |key, value|
+      json['data']&.each do |key, value|
         puts "  #{key}=#{value}"
       end
 
       json = kubeget 'secrets', 'app-secrets'
-      json['data'].each do |key, value|
+      json['data']&.each do |key, value|
         puts "  #{key}=#{Base64.decode64(value)[0...5] + '***'}"
       end
 
