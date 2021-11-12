@@ -215,7 +215,7 @@ module Cuber
     def kubeget type, name = nil
       cmd = ['kubectl', 'get', type, name, '-o', 'json', '--kubeconfig', @options[:kubeconfig], '-n', @options[:app]].compact
       out, status = Open3.capture2 *cmd
-      abort 'Cuber: kubectl get failed' unless status.success?
+      abort "Cuber: \"#{cmd.shelljoin}\" failed" unless status.success?
       JSON.parse(out)
     end
 
