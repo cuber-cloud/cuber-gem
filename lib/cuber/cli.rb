@@ -50,10 +50,10 @@ module Cuber
       json['items'].each do |proc|
         name = proc['metadata']['name']
         command = proc['spec']['template']['spec']['containers'][0]['command'].shelljoin
-        available = proc['status']['availableReplicas']
-        updated = proc['status']['updatedReplicas']
-        replicas = proc['status']['replicas']
-        scale = proc['spec']['replicas']
+        available = proc['status']['availableReplicas'].to_i
+        updated = proc['status']['updatedReplicas'].to_i
+        replicas = proc['status']['replicas'].to_i
+        scale = proc['spec']['replicas'].to_i
         puts "  #{name}: #{command} (#{available}/#{scale}) #{'OUT-OF-DATE' if replicas - updated > 0}"
       end
 
