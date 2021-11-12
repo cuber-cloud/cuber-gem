@@ -54,6 +54,25 @@ module Cuber
         scale = proc['spec']['replicas']
         puts "  #{name}: #{command} (#{available}/#{scale})"
       end
+
+      puts "Issues:"
+
+      issues_count = 0
+      json = kubeget 'pods'
+      json['items'].each do |pod|
+        name = pod['metadata']['name']
+        pod_status = pod['status']['phase']
+        container_ready = pod['status']['containerStatuses'][0]['ready']
+        if pod_status != 'Running'
+          issues_count += 1
+          puts "  #{name}: #{pod_status}"
+        elsif !container_ready
+          issues_count += 1
+          container_status = pod['status']['containerStatuses'][0]['state']
+          puts "  #{name}: #{container_status}"
+        end
+      end
+      puts "  None detected" if issues_count.zero?
     end
 
     def logs
