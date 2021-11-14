@@ -9,6 +9,7 @@ module Cuber
       @cache = nil
       @dockerconfig = nil
       @kubeconfig = nil
+      @migrate = nil
       @procs = {}
       @secrets = {}
       @env = {}
@@ -48,6 +49,10 @@ module Cuber
 
     def kubeconfig path
       @kubeconfig = path
+    end
+
+    def migrate cmd, check: nil
+      @migrate = { cmd: cmd, check: check }
     end
 
     def proc name, cmd, scale: 1
