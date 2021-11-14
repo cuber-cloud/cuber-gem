@@ -29,8 +29,10 @@ module Cuber
 
       abort 'Cuber: app not found' if json.dig('metadata', 'labels', 'app.kubernetes.io/managed-by') != 'cuber'
 
-      puts "App: #{json['metadata']['labels']['app.kubernetes.io/name']}"
-      puts "Version: #{json['metadata']['labels']['app.kubernetes.io/version']}"
+      app_name = json['metadata']['labels']['app.kubernetes.io/name']
+      app_version = json['metadata']['labels']['app.kubernetes.io/version']
+      puts "App: #{app_name}"
+      puts "Version: #{app_version}"
 
       json = kubeget 'service', 'load-balancer'
       puts "Public IP: #{json['status']['loadBalancer']['ingress'][0]['ip']}"
@@ -45,6 +47,18 @@ module Cuber
       json = kubeget 'secrets', 'app-secrets'
       json['data']&.each do |key, value|
         puts "  #{key}=#{Base64.decode64(value)[0...5] + '***'}"
+      end
+
+      puts "Migration:"
+
+      migration = "migrate-#{app_version}"
+      json = kubeget 'job', migration, '--ignore-not-found'
+      if json
+        migration_command = json['spec']['template']['spec']['containers'][0]['command'].shelljoin
+        migration_status = json['status']['succeeded'].to_i.zero? ? 'Pending' : 'Completed'
+        puts "  #{migration_command} (#{migration_status})"
+      else
+        puts "  None detected"
       end
 
       puts "Proc:"
@@ -68,6 +82,7 @@ module Cuber
         name = pod['metadata']['name']
         pod_status = pod['status']['phase']
         container_ready = pod['status']['containerStatuses'][0]['ready']
+        next if pod_status == 'Succeeded'
         if pod_status != 'Running'
           issues_count += 1
           puts "  #{name}: #{pod_status}"
