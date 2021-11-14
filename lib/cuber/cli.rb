@@ -215,11 +215,11 @@ module Cuber
       system(*cmd) || abort("Cuber: \"#{cmd.shelljoin}\" failed")
     end
 
-    def kubeget type, name = nil
-      cmd = ['kubectl', 'get', type, name, '-o', 'json', '--kubeconfig', @options[:kubeconfig], '-n', @options[:app]].compact
+    def kubeget type, name = nil, *args
+      cmd = ['kubectl', 'get', type, name, '-o', 'json', '--kubeconfig', @options[:kubeconfig], '-n', @options[:app], *args].compact
       out, status = Open3.capture2 *cmd
       abort "Cuber: \"#{cmd.shelljoin}\" failed" unless status.success?
-      JSON.parse(out)
+      out.empty? ? nil : JSON.parse(out)
     end
 
     def kubeexec command
