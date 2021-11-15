@@ -113,11 +113,15 @@ module Cuber
     end
 
     def deploy
-      checkout
-      set_release_name
-      dockerfile
-      build
-      push
+      if @options[:release]
+        print_step 'Deploying a past release'
+      else
+        checkout
+        set_release_name
+        dockerfile
+        build
+        push
+      end
       configure
       apply
       rollout

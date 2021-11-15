@@ -2,6 +2,7 @@ module Cuber
   class CuberfileParser
     def initialize
       @app = nil
+      @release = nil
       @repo = nil
       @dockerfile = nil
       @ruby = nil
@@ -21,6 +22,10 @@ module Cuber
 
     def app name
       @app = name
+    end
+
+    def release version
+      @release = version
     end
 
     def repo uri
