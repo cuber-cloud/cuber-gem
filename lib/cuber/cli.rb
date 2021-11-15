@@ -30,6 +30,7 @@ module Cuber
       abort 'Cuber: app not found' if json.dig('metadata', 'labels', 'app.kubernetes.io/managed-by') != 'cuber'
 
       app_name = json['metadata']['labels']['app.kubernetes.io/name']
+      app_instance = json['metadata']['labels']['app.kubernetes.io/instance']
       app_version = json['metadata']['labels']['app.kubernetes.io/version']
       puts "App: #{app_name}"
       puts "Version: #{app_version}"
@@ -51,7 +52,7 @@ module Cuber
 
       puts "Migration:"
 
-      migration = "migrate-#{app_version}"
+      migration = "migrate-#{app_instance}"
       json = kubeget 'job', migration, '--ignore-not-found'
       if json
         migration_command = json['spec']['template']['spec']['containers'][0]['command'].shelljoin
@@ -161,6 +162,7 @@ module Cuber
 
     def configure
       print_step 'Generating Kubernetes configuration'
+      @options[:instance] = "#{@options[:app]}-#{Time.now.utc.iso8601.delete('^0-9')}"
       @options[:dockerconfigjson] = Base64.strict_encode64 File.read File.expand_path(@options[:dockerconfig] || '~/.docker/config.json')
       render 'deployment.yml', '.cuber/kubernetes/deployment.yml'
     end
