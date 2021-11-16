@@ -12,6 +12,7 @@ module Cuber
       @kubeconfig = nil
       @migrate = nil
       @procs = {}
+      @cron = {}
       @secrets = {}
       @env = {}
     end
@@ -62,6 +63,10 @@ module Cuber
 
     def proc name, cmd, scale: 1
       @procs[name] = { cmd: cmd, scale: scale }
+    end
+
+    def cron name, schedule, cmd
+      @cron[name] = { schedule: schedule, cmd: cmd }
     end
 
     def env key, value, secret: false
