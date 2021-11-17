@@ -14,172 +14,13 @@ module Cuber
     def initialize
       @options = {}
       parse_options!
+      parse_command!
       parse_cuberfile
-      @options[:cmd] = ARGV.shift&.to_sym
       validate_options
-      public_send @options[:cmd]
-    end
-
-    def version
-      puts "Cuber v#{Cuber::VERSION}"
-    end
-
-    def info
-      json = kubeget 'namespace', @options[:app]
-
-      abort 'Cuber: app not found' if json.dig('metadata', 'labels', 'app.kubernetes.io/managed-by') != 'cuber'
-
-      app_name = json['metadata']['labels']['app.kubernetes.io/name']
-      app_instance = json['metadata']['labels']['app.kubernetes.io/instance']
-      app_version = json['metadata']['labels']['app.kubernetes.io/version']
-      puts "App: #{app_name}"
-      puts "Version: #{app_version}"
-
-      json = kubeget 'service', 'load-balancer'
-      puts "Public IP: #{json['status']['loadBalancer']['ingress'][0]['ip']}"
-
-      puts "Env:"
-
-      json = kubeget 'configmap', 'env'
-      json['data']&.each do |key, value|
-        puts "  #{key}=#{value}"
-      end
-
-      json = kubeget 'secrets', 'app-secrets'
-      json['data']&.each do |key, value|
-        puts "  #{key}=#{Base64.decode64(value)[0...5] + '***'}"
-      end
-
-      puts "Migration:"
-
-      migration = "migrate-#{app_instance}"
-      json = kubeget 'job', migration, '--ignore-not-found'
-      if json
-        migration_command = json['spec']['template']['spec']['containers'][0]['command'].shelljoin
-        migration_status = json['status']['succeeded'].to_i.zero? ? 'Pending' : 'Completed'
-        puts "  #{migration_command} (#{migration_status})"
-      else
-        puts "  None detected"
-      end
-
-      puts "Proc:"
-
-      json = kubeget 'deployments'
-      json['items'].each do |proc|
-        name = proc['metadata']['name']
-        command = proc['spec']['template']['spec']['containers'][0]['command'].shelljoin
-        available = proc['status']['availableReplicas'].to_i
-        updated = proc['status']['updatedReplicas'].to_i
-        replicas = proc['status']['replicas'].to_i
-        scale = proc['spec']['replicas'].to_i
-        puts "  #{name}: #{command} (#{available}/#{scale}) #{'OUT-OF-DATE' if replicas - updated > 0}"
-      end
-
-      puts "Issues:"
-
-      issues_count = 0
-      json = kubeget 'pods'
-      json['items'].each do |pod|
-        name = pod['metadata']['name']
-        pod_status = pod['status']['phase']
-        container_ready = pod['status']['containerStatuses'][0]['ready']
-        next if pod_status == 'Succeeded'
-        if pod_status != 'Running'
-          issues_count += 1
-          puts "  #{name}: #{pod_status}"
-        elsif !container_ready
-          issues_count += 1
-          container_status = pod['status']['containerStatuses'][0]['state'].values.first['reason']
-          puts "  #{name}: #{container_status}"
-        end
-      end
-      puts "  None detected" if issues_count.zero?
-    end
-
-    def logs
-      pod = ARGV.first
-      cmd = ['logs', '--tail', '100']
-      cmd += pod ? [pod] : ['-l', "app.kubernetes.io/name=#{@options[:app]}"]
-      kubectl *cmd
-    end
-
-    def restart
-      kubectl 'rollout', 'restart', 'deploy'
-    end
-
-    def run
-      set_current_release
-      command = ARGV.one? ? ARGV.first : ARGV.shelljoin
-      kubeexec command
-    end
-
-    def deploy
-      if @options[:release]
-        print_step 'Deploying a past release'
-      else
-        checkout
-        set_release_name
-        dockerfile
-        build
-        push
-      end
-      configure
-      apply
-      rollout
+      execute
     end
 
     private
-
-    def checkout
-      print_step 'Cloning Git repository'
-      path = '.cuber/repo'
-      FileUtils.mkdir_p path
-      FileUtils.rm_rf path, secure: true
-      system('git', 'clone', '--depth', '1', @options[:repo], path) || abort('Cuber: git clone failed')
-    end
-
-    def dockerfile
-      print_step 'Generating Dockerfile'
-      return if @options[:dockerfile]
-      render 'Dockerfile', '.cuber/repo/Dockerfile'
-    end
-
-    def build
-      print_step 'Building image from Dockerfile'
-      dockerfile = @options[:dockerfile] || 'Dockerfile'
-      tag = "#{@options[:image]}:#{@options[:release]}"
-      cmd = ['docker', 'build']
-      cmd += ['--pull', '--no-cache'] if @options[:cache] == false
-      cmd += ['--progress', 'plain', '-f', dockerfile, '-t', tag, '.']
-      system(*cmd, chdir: '.cuber/repo') || abort('Cuber: docker build failed')
-    end
-
-    def push
-      print_step 'Pushing image to Docker registry'
-      tag = "#{@options[:image]}:#{@options[:release]}"
-      system('docker', 'push', tag) || abort('Cuber: docker push failed')
-    end
-
-    def configure
-      print_step 'Generating Kubernetes configuration'
-      @options[:instance] = "#{@options[:app]}-#{Time.now.utc.iso8601.delete('^0-9')}"
-      @options[:dockerconfigjson] = Base64.strict_encode64 File.read File.expand_path(@options[:dockerconfig] || '~/.docker/config.json')
-      render 'deployment.yml', '.cuber/kubernetes/deployment.yml'
-    end
-
-    def apply
-      print_step 'Applying configuration to Kubernetes cluster'
-      kubectl 'apply',
-        '-f', '.cuber/kubernetes/deployment.yml',
-        '--prune', '-l', "app.kubernetes.io/name=#{@options[:app]},app.kubernetes.io/managed-by=cuber"
-    end
-
-    def rollout
-      print_step 'Verifying deployment status'
-      @options[:procs].each_key do |procname|
-        kubectl 'rollout', 'status', "deployment/#{procname}"
-      end
-    end
 
     def parse_options!
       OptionParser.new do |opts|
@@ -188,6 +29,10 @@ module Cuber
           @options[:environment] = e
         end
       end.parse!
+    end
+
+    def parse_command!
+      @options[:cmd] = ARGV.shift&.to_sym
     end
 
     def parse_cuberfile
@@ -202,7 +47,6 @@ module Cuber
     end
 
     def validate_options
-      abort "Cuber: \"#{@options[:cmd]}\" is not a command" unless @options[:cmd] and respond_to? @options[:cmd]
       abort 'Cuberfile: app must be present' if @options[:app].to_s.strip.empty?
       abort 'Cuberfile: repo must be present' if @options[:repo].to_s.strip.empty?
       abort 'Cuberfile: dockerfile must be a file' unless @options[:dockerfile].nil? or File.exists? @options[:dockerfile]
@@ -215,58 +59,10 @@ module Cuber
       abort 'Cuberfile: env invalid format' if @options[:env].merge(@options[:secrets]).any? { |key, value| key !~ /\A[a-zA-Z_]+[a-zA-Z0-9_]*\z/ }
     end
 
-    def commit_hash
-      out, status = Open3.capture2 'git', 'rev-parse', '--short', 'HEAD', chdir: '.cuber/repo'
-      abort 'Cuber: cannot get commit hash' unless status.success?
-      out.strip
-    end
-
-    def set_release_name
-      @options[:release] = "#{commit_hash}-#{Time.now.utc.iso8601.delete('^0-9')}"
-    end
-
-    def set_current_release
-      json = kubeget 'namespace', @options[:app]
-      @options[:app] = json['metadata']['labels']['app.kubernetes.io/name']
-      @options[:release] = json['metadata']['labels']['app.kubernetes.io/version']
-      @options[:image] = json['metadata']['annotations']['image']
-    end
-
-    def kubectl *args
-      cmd = ['kubectl', '--kubeconfig', @options[:kubeconfig], '-n', @options[:app]] + args
-      system(*cmd) || abort("Cuber: \"#{cmd.shelljoin}\" failed")
-    end
-
-    def kubeget type, name = nil, *args
-      cmd = ['kubectl', 'get', type, name, '-o', 'json', '--kubeconfig', @options[:kubeconfig], '-n', @options[:app], *args].compact
-      out, status = Open3.capture2 *cmd
-      abort "Cuber: \"#{cmd.shelljoin}\" failed" unless status.success?
-      out.empty? ? nil : JSON.parse(out)
-    end
-
-    def kubeexec command
-      @options[:pod] = "pod-#{command.downcase.gsub(/[^a-z0-9]+/, '-')}-#{Time.now.utc.iso8601.delete('^0-9')}"
-      path = ".cuber/kubernetes/#{@options[:pod]}.yml"
-      render 'pod.yml', path
-      kubectl 'apply', '-f', path
-      kubectl 'wait', '--for', 'condition=ready', "pod/#{@options[:pod]}"
-      kubectl 'exec', '-it', @options[:pod], '--', *command.shellsplit
-      kubectl 'delete', 'pod', @options[:pod], '--wait=false'
-      File.delete path
-    end
-
-    def render template, target_file = nil
-      template = File.join __dir__, 'templates', "#{template}.erb"
-      renderer = ERB.new File.read(template), trim_mode: '-'
-      content = renderer.result binding
-      return content unless target_file
-      FileUtils.mkdir_p File.dirname target_file
-      File.write target_file, content
-    end
-
-    def print_step desc
-      puts
-      puts "\e[34m-----> #{desc}\e[0m"
+    def execute
+      command_class = @options[:cmd]&.capitalize
+      abort "Cuber: \"#{@options[:cmd]}\" is not a command" unless command_class && Cuber::Commands.const_defined?(command_class)
+      Cuber::Commands.const_get(command_class).new(@options).execute
     end
 
   end
