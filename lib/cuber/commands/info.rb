@@ -4,37 +4,51 @@ module Cuber::Commands
 
     def initialize options
       @options = options
+      @namespace = nil
     end
 
     def execute
-      json = kubeget 'namespace', @options[:app]
+      set_namespace
+      print_app_version
+      print_public_ip
+      print_env
+      print_migration
+      print_proc
+      print_issues
+    end
 
-      abort 'Cuber: app not found' if json.dig('metadata', 'labels', 'app.kubernetes.io/managed-by') != 'cuber'
+    private
 
-      app_name = json['metadata']['labels']['app.kubernetes.io/name']
-      app_instance = json['metadata']['labels']['app.kubernetes.io/instance']
-      app_version = json['metadata']['labels']['app.kubernetes.io/version']
-      puts "App: #{app_name}"
-      puts "Version: #{app_version}"
+    def set_namespace
+      @namespace = kubeget 'namespace', @options[:app]
+      abort 'Cuber: app not found' if @namespace.dig('metadata', 'labels', 'app.kubernetes.io/managed-by') != 'cuber'
+    end
 
+    def print_app_version
+      puts "App: #{@namespace['metadata']['labels']['app.kubernetes.io/name']}"
+      puts "Version: #{@namespace['metadata']['labels']['app.kubernetes.io/version']}"
+    end
+
+    def print_public_ip
       json = kubeget 'service', 'load-balancer'
       puts "Public IP: #{json['status']['loadBalancer']['ingress'][0]['ip']}"
+    end
 
+    def print_env
       puts "Env:"
-
       json = kubeget 'configmap', 'env'
       json['data']&.each do |key, value|
         puts "  #{key}=#{value}"
       end
-
       json = kubeget 'secrets', 'app-secrets'
       json['data']&.each do |key, value|
         puts "  #{key}=#{Base64.decode64(value)[0...5] + '***'}"
       end
+    end
 
+    def print_migration
       puts "Migration:"
-
-      migration = "migrate-#{app_instance}"
+      migration = "migrate-#{@namespace['metadata']['labels']['app.kubernetes.io/instance']}"
       json = kubeget 'job', migration, '--ignore-not-found'
       if json
         migration_command = json['spec']['template']['spec']['containers'][0]['command'].shelljoin
@@ -43,9 +57,10 @@ module Cuber::Commands
       else
         puts "  None detected"
       end
+    end
 
+    def print_proc
       puts "Proc:"
-
       json = kubeget 'deployments'
       json['items'].each do |proc|
         name = proc['metadata']['name']
@@ -56,9 +71,10 @@ module Cuber::Commands
         scale = proc['spec']['replicas'].to_i
         puts "  #{name}: #{command} (#{available}/#{scale}) #{'OUT-OF-DATE' if replicas - updated > 0}"
       end
+    end
 
+    def print_issues
       puts "Issues:"
-
       issues_count = 0
       json = kubeget 'pods'
       json['items'].each do |pod|
