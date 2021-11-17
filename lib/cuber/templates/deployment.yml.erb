@@ -171,8 +171,20 @@ spec:
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/name: <%= @options[:app] %>
+        app.kubernetes.io/instance: <%= @options[:instance] %>
+        app.kubernetes.io/version: <%= @options[:release] %>
+        app.kubernetes.io/managed-by: cuber
     spec:
       template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: <%= @options[:app] %>
+            app.kubernetes.io/instance: <%= @options[:instance] %>
+            app.kubernetes.io/version: <%= @options[:release] %>
+            app.kubernetes.io/managed-by: cuber
         spec:
           containers:
           - name: task
