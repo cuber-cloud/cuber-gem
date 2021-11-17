@@ -16,7 +16,7 @@ module Cuber
       parse_options!
       parse_command!
       parse_cuberfile
-      validate_options
+      validate_cuberfile
       execute
     end
 
@@ -46,17 +46,11 @@ module Cuber
       @options.merge! cuberfile_options
     end
 
-    def validate_options
-      abort 'Cuberfile: app must be present' if @options[:app].to_s.strip.empty?
-      abort 'Cuberfile: repo must be present' if @options[:repo].to_s.strip.empty?
-      abort 'Cuberfile: dockerfile must be a file' unless @options[:dockerfile].nil? or File.exists? @options[:dockerfile]
-      abort 'Cuberfile: ruby version must be present' if @options[:ruby].to_s.strip.empty?
-      abort 'Cuberfile: image must be present' if @options[:image].to_s.strip.empty?
-      abort 'Cuberfile: dockerconfig must be a file' unless @options[:dockerconfig].nil? or File.exists? @options[:dockerconfig]
-      abort 'Cuberfile: kubeconfig must be present' if @options[:kubeconfig].to_s.strip.empty?
-      abort 'Cuberfile: proc invalid format' if @options[:procs].any? { |key, value| key !~ /\A[a-z]+\z/ }
-      abort 'Cuberfile: cron invalid format' if @options[:cron].any? { |key, value| key !~ /\A[a-z]+\z/ }
-      abort 'Cuberfile: env invalid format' if @options[:env].merge(@options[:secrets]).any? { |key, value| key !~ /\A[a-zA-Z_]+[a-zA-Z0-9_]*\z/ }
+    def validate_cuberfile
+      validator = CuberfileValidator.new @options
+      errors = validator.validate
+      errors.each { |err| $stderr.puts "Cuberfile: #{err}" }
+      abort unless errors.empty?
     end
 
     def execute

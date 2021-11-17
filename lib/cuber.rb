@@ -1,6 +1,7 @@
 require 'cuber/version'
 require 'cuber/cli'
 require 'cuber/cuberfile_parser'
+require 'cuber/cuberfile_validator'
 require 'cuber/utils'
 require 'cuber/commands/version'
 require 'cuber/commands/info'
