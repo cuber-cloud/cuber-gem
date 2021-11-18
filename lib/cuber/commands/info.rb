@@ -14,6 +14,7 @@ module Cuber::Commands
       print_env
       print_migration
       print_proc
+      print_cron
       print_issues
     end
 
@@ -70,6 +71,18 @@ module Cuber::Commands
         replicas = proc['status']['replicas'].to_i
         scale = proc['spec']['replicas'].to_i
         puts "  #{name}: #{command} (#{available}/#{scale}) #{'OUT-OF-DATE' if replicas - updated > 0}"
+      end
+    end
+
+    def print_cron
+      puts "Cron:"
+      json = kubeget 'cronjobs'
+      json['items'].each do |cron|
+        name = cron['metadata']['name']
+        schedule = cron['spec']['schedule']
+        command = cron['spec']['jobTemplate']['spec']['template']['spec']['containers'][0]['command'].shelljoin
+        last = cron['status']['lastScheduleTime']
+        puts "  #{name}: #{schedule} #{command} (#{last})"
       end
     end
 
