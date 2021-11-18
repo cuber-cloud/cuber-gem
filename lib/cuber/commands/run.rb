@@ -8,7 +8,6 @@ module Cuber::Commands
 
     def execute
       set_current_release
-      command = ARGV.one? ? ARGV.first : ARGV.shelljoin
       kubeexec command
     end
 
@@ -19,6 +18,16 @@ module Cuber::Commands
       @options[:app] = json['metadata']['labels']['app.kubernetes.io/name']
       @options[:release] = json['metadata']['labels']['app.kubernetes.io/version']
       @options[:image] = json['metadata']['annotations']['image']
+    end
+
+    def command
+      if ARGV.length == 0
+        'sh'
+      elsif ARGV.length == 1
+        ARGV.first
+      else
+        ARGV.shelljoin
+      end
     end
 
     def kubeexec command
