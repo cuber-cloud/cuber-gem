@@ -168,6 +168,7 @@ metadata:
     app.kubernetes.io/managed-by: cuber
 spec:
   schedule: <%= cron[:schedule].to_json %>
+  concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   jobTemplate:
@@ -178,6 +179,7 @@ spec:
         app.kubernetes.io/version: <%= @options[:release] %>
         app.kubernetes.io/managed-by: cuber
     spec:
+      backoffLimit: 0
       template:
         metadata:
           labels:
