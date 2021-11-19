@@ -89,7 +89,7 @@ module Cuber::Commands
         schedule = cron['spec']['schedule']
         command = cron['spec']['jobTemplate']['spec']['template']['spec']['containers'][0]['command'].shelljoin
         last = cron['status']['lastScheduleTime']
-        puts "#{name}: #{schedule} #{command} (#{last})"
+        puts "#{name}: #{schedule} #{command} (#{time_ago_in_words Time.parse(last)})"
       end
     end
 
@@ -112,6 +112,16 @@ module Cuber::Commands
         end
       end
       puts "None detected" if issues_count.zero?
+    end
+
+    def time_ago_in_words time
+      seconds = (Time.now - time).round
+      case
+      when seconds < 60 then "#{seconds}s"
+      when seconds < 60*60 then "#{(seconds / 60)}m"
+      when seconds < 60*60*24 then "#{(seconds / 60 / 60)}h"
+      else "#{(seconds / 60 / 60 / 24)}d"
+      end
     end
 
   end
