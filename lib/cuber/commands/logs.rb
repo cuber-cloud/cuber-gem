@@ -8,7 +8,7 @@ module Cuber::Commands
 
     def execute
       pod = ARGV.first
-      cmd = ['logs', '--tail', '100']
+      cmd = ['logs']
       cmd += pod ? [pod] : ['-l', "app.kubernetes.io/name=#{@options[:app]}"]
       kubectl *cmd
     end
