@@ -15,7 +15,7 @@ module Cuber::Commands
       print_migration
       print_proc
       print_cron
-      print_issues
+      print_pods
     end
 
     private
@@ -93,25 +93,20 @@ module Cuber::Commands
       end
     end
 
-    def print_issues
-      print_section 'Issues'
-      issues_count = 0
+    def print_pods
+      print_section 'Pods'
       json = kubeget 'pods'
       json['items'].each do |pod|
         name = pod['metadata']['name']
         pod_status = pod['status']['phase']
         container_ready = pod['status']['containerStatuses'][0]['ready']
-        next if pod_status == 'Succeeded'
-        if pod_status != 'Running'
-          issues_count += 1
-          puts "#{name}: #{pod_status}"
-        elsif !container_ready
-          issues_count += 1
-          container_status = pod['status']['containerStatuses'][0]['state'].values.first['reason']
-          puts "#{name}: #{container_status}"
+        container_status = pod['status']['containerStatuses'][0]['state'].values.first['reason']
+        if pod_status == 'Succeeded' || (pod_status == 'Running' && container_ready)
+          puts "#{name}: \e[32m#{container_status || pod_status}\e[0m"
+        else
+          puts "#{name}: \e[31m#{container_status || pod_status}\e[0m"
         end
       end
-      puts "None detected" if issues_count.zero?
     end
 
     def time_ago_in_words time
