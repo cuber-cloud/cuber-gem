@@ -98,13 +98,14 @@ module Cuber::Commands
       json = kubeget 'pods'
       json['items'].each do |pod|
         name = pod['metadata']['name']
+        created_at = pod['metadata']['creationTimestamp']
         pod_status = pod['status']['phase']
         container_ready = pod['status']['containerStatuses'][0]['ready']
         container_status = pod['status']['containerStatuses'][0]['state'].values.first['reason']
         if pod_status == 'Succeeded' || (pod_status == 'Running' && container_ready)
-          puts "#{name}: \e[32m#{container_status || pod_status}\e[0m"
+          puts "#{name}: \e[32m#{container_status || pod_status}\e[0m (#{time_ago_in_words Time.parse(created_at)})"
         else
-          puts "#{name}: \e[31m#{container_status || pod_status}\e[0m"
+          puts "#{name}: \e[31m#{container_status || pod_status}\e[0m (#{time_ago_in_words Time.parse(created_at)})"
         end
       end
     end
