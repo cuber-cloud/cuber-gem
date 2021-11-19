@@ -89,7 +89,7 @@ module Cuber::Commands
         schedule = cron['spec']['schedule']
         command = cron['spec']['jobTemplate']['spec']['template']['spec']['containers'][0]['command'].shelljoin
         last = cron['status']['lastScheduleTime']
-        puts "#{name}: #{schedule} #{command} (#{time_ago_in_words Time.parse(last)})"
+        puts "#{name}: #{schedule} #{command} (#{time_ago_in_words last})"
       end
     end
 
@@ -103,14 +103,15 @@ module Cuber::Commands
         container_ready = pod['status']['containerStatuses'][0]['ready']
         container_status = pod['status']['containerStatuses'][0]['state'].values.first['reason']
         if pod_status == 'Succeeded' || (pod_status == 'Running' && container_ready)
-          puts "#{name}: \e[32m#{container_status || pod_status}\e[0m (#{time_ago_in_words Time.parse(created_at)})"
+          puts "#{name}: \e[32m#{container_status || pod_status}\e[0m (#{time_ago_in_words created_at})"
         else
-          puts "#{name}: \e[31m#{container_status || pod_status}\e[0m (#{time_ago_in_words Time.parse(created_at)})"
+          puts "#{name}: \e[31m#{container_status || pod_status}\e[0m (#{time_ago_in_words created_at})"
         end
       end
     end
 
     def time_ago_in_words time
+      time = Time.parse time unless time.is_a? Time
       seconds = (Time.now - time).round
       case
       when seconds < 60 then "#{seconds}s"
