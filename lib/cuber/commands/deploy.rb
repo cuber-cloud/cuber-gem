@@ -54,7 +54,7 @@ module Cuber::Commands
       print_step 'Building image using buildpacks'
       tag = "#{@options[:image]}:#{@options[:release]}"
       cmd = ['pack', 'build', tag, '--builder', @options[:buildpacks], '--publish']
-      cmd += ['--clear-cache'] if @options[:cache] == false
+      cmd += ['--pull-policy', 'always', '--clear-cache'] if @options[:cache] == false
       system(*cmd, chdir: '.cuber/repo') || abort('Cuber: pack build failed')
     end
 
