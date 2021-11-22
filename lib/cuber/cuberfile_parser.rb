@@ -4,6 +4,7 @@ module Cuber
       @app = nil
       @release = nil
       @repo = nil
+      @buildpacks = nil
       @dockerfile = nil
       @ruby = nil
       @image = nil
@@ -31,6 +32,10 @@ module Cuber
 
     def repo uri
       @repo = uri
+    end
+
+    def buildpacks builder
+      @buildpacks = builder
     end
 
     def dockerfile path

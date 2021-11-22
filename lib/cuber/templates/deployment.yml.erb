@@ -82,7 +82,12 @@ spec:
       - name: migration
         image: <%= @options[:image] %>:<%= @options[:release] %>
         imagePullPolicy: Always
+        <%- if @options[:buildpacks] -%>
+        command: ["launcher"]
+        args: <%= @options[:migrate][:cmd].shellsplit %>
+        <%- else -%>
         command: <%= @options[:migrate][:cmd].shellsplit %>
+        <%- end -%>
         envFrom:
         - configMapRef:
             name: env
@@ -124,7 +129,12 @@ spec:
       - name: <%= procname %>-proc
         image: <%= @options[:image] %>:<%= @options[:release] %>
         imagePullPolicy: Always
+        <%- if @options[:buildpacks] -%>
+        command: ["launcher"]
+        args: <%= proc[:cmd].shellsplit %>
+        <%- else -%>
         command: <%= proc[:cmd].shellsplit %>
+        <%- end -%>
         ports:
         - containerPort: 3000
         envFrom:
@@ -143,7 +153,12 @@ spec:
       - name: migration-check
         image: <%= @options[:image] %>:<%= @options[:release] %>
         imagePullPolicy: Always
+        <%- if @options[:buildpacks] -%>
+        command: ["launcher"]
+        args: <%= @options[:migrate][:check].shellsplit %>
+        <%- else -%>
         command: <%= @options[:migrate][:check].shellsplit %>
+        <%- end -%>
         envFrom:
         - configMapRef:
             name: env
@@ -192,7 +207,12 @@ spec:
           - name: task
             image: <%= @options[:image] %>:<%= @options[:release] %>
             imagePullPolicy: Always
+            <%- if @options[:buildpacks] -%>
+            command: ["launcher"]
+            args: <%= cron[:cmd].shellsplit %>
+            <%- else -%>
             command: <%= cron[:cmd].shellsplit %>
+            <%- end -%>
             envFrom:
             - configMapRef:
                 name: env

@@ -12,9 +12,13 @@ module Cuber::Commands
       else
         checkout
         set_release_name
-        dockerfile
-        build
-        push
+        if @options[:buildpacks]
+          pack
+        else
+          dockerfile
+          build
+          push
+        end
       end
       configure
       apply
@@ -44,6 +48,14 @@ module Cuber::Commands
 
     def set_release_name
       @options[:release] = "#{commit_hash}-#{Time.now.utc.iso8601.delete('^0-9')}"
+    end
+
+    def pack
+      print_step 'Building image using buildpacks'
+      tag = "#{@options[:image]}:#{@options[:release]}"
+      cmd = ['pack', 'build', tag, '--builder', @options[:buildpacks], '--publish']
+      cmd += ['--clear-cache'] if @options[:cache] == false
+      system(*cmd, chdir: '.cuber/repo') || abort('Cuber: pack build failed')
     end
 
     def dockerfile
