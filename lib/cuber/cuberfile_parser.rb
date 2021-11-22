@@ -6,7 +6,6 @@ module Cuber
       @repo = nil
       @buildpacks = nil
       @dockerfile = nil
-      @ruby = nil
       @image = nil
       @cache = nil
       @dockerconfig = nil
@@ -40,10 +39,6 @@ module Cuber
 
     def dockerfile path
       @dockerfile = path
-    end
-
-    def ruby version
-      @ruby = version
     end
 
     def image name

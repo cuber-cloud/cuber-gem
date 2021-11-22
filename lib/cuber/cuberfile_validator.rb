@@ -12,7 +12,6 @@ module Cuber
       validate_repo
       validate_buildpacks
       validate_dockerfile
-      validate_ruby
       validate_image
       validate_cache
       validate_dockerconfig
@@ -48,10 +47,6 @@ module Cuber
     def validate_dockerfile
       return unless @options[:dockerfile]
       @errors << 'dockerfile must be a file' unless File.exists? @options[:dockerfile]
-    end
-
-    def validate_ruby
-      @errors << 'ruby version must be present' if @options[:ruby].to_s.strip.empty?
     end
 
     def validate_image

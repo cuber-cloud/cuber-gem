@@ -15,7 +15,6 @@ module Cuber::Commands
         if @options[:buildpacks]
           pack
         else
-          dockerfile
           build
           push
         end
@@ -56,12 +55,6 @@ module Cuber::Commands
       cmd = ['pack', 'build', tag, '--builder', @options[:buildpacks], '--publish']
       cmd += ['--pull-policy', 'always', '--clear-cache'] if @options[:cache] == false
       system(*cmd, chdir: '.cuber/repo') || abort('Cuber: pack build failed')
-    end
-
-    def dockerfile
-      print_step 'Generating Dockerfile'
-      return if @options[:dockerfile]
-      render 'Dockerfile', '.cuber/repo/Dockerfile'
     end
 
     def build
