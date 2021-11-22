@@ -18,6 +18,7 @@ module Cuber::Commands
       @options[:app] = json['metadata']['labels']['app.kubernetes.io/name']
       @options[:release] = json['metadata']['labels']['app.kubernetes.io/version']
       @options[:image] = json['metadata']['annotations']['image']
+      @options[:buildpacks] = json['metadata']['annotations']['buildpacks']
     end
 
     def command
@@ -33,10 +34,12 @@ module Cuber::Commands
     def kubeexec command
       @options[:pod] = "pod-#{command.downcase.gsub(/[^a-z0-9]+/, '-')}-#{Time.now.utc.iso8601.delete('^0-9')}"
       path = ".cuber/kubernetes/#{@options[:pod]}.yml"
+      full_command = command.shellsplit
+      full_command.unshift 'launcher' if @options[:buildpacks]
       render 'pod.yml', path
       kubectl 'apply', '-f', path
       kubectl 'wait', '--for', 'condition=ready', "pod/#{@options[:pod]}"
-      kubectl 'exec', '-it', @options[:pod], '--', *command.shellsplit
+      kubectl 'exec', '-it', @options[:pod], '--', *full_command
       kubectl 'delete', 'pod', @options[:pod], '--wait=false'
       File.delete path
     end

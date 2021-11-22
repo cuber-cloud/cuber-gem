@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/managed-by: cuber
   annotations:
     image: <%= @options[:image] %>
+    buildpacks: <%= @options[:buildpacks] %>
 
 ---
 apiVersion: v1
