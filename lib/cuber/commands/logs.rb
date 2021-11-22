@@ -10,6 +10,7 @@ module Cuber::Commands
       pod = ARGV.first
       cmd = ['logs']
       cmd += pod ? [pod] : ['-l', "app.kubernetes.io/name=#{@options[:app]}"]
+      cmd += ['--all-containers']
       kubectl *cmd
     end
 
