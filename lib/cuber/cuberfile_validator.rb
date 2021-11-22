@@ -10,6 +10,7 @@ module Cuber
       validate_app
       validate_release
       validate_repo
+      validate_buildpacks
       validate_dockerfile
       validate_ruby
       validate_image
@@ -37,6 +38,11 @@ module Cuber
 
     def validate_repo
       @errors << 'repo must be present' if @options[:repo].to_s.strip.empty?
+    end
+
+    def validate_buildpacks
+      return unless @options[:buildpacks]
+      @errors << 'buildpacks is not compatible with the dockerfile option' if @options[:dockerfile]
     end
 
     def validate_dockerfile
