@@ -15,6 +15,7 @@ module Cuber
       @cron = {}
       @secrets = {}
       @env = {}
+      @lb = {}
     end
 
     def method_missing m, *args
@@ -71,6 +72,10 @@ module Cuber
 
     def env key, value, secret: false
       secret ? (@secrets[key] = value) : (@env[key] = value)
+    end
+
+    def lb key, value
+      @lb[key] = value
     end
   end
 end

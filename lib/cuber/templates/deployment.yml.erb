@@ -235,6 +235,10 @@ metadata:
     app.kubernetes.io/instance: <%= @options[:instance] %>
     app.kubernetes.io/version: <%= @options[:release] %>
     app.kubernetes.io/managed-by: cuber
+  annotations:
+    <%- @options[:lb].each do |key, value| -%>
+    <%= key %>: <%= value.to_json %>
+    <%- end -%>
 spec:
   type: LoadBalancer
   selector:
