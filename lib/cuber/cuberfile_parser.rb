@@ -16,6 +16,7 @@ module Cuber
       @secrets = {}
       @env = {}
       @lb = {}
+      @ssl = nil
     end
 
     def method_missing m, *args
@@ -76,6 +77,10 @@ module Cuber
 
     def lb key, value
       @lb[key] = value
+    end
+
+    def ssl crt, key
+      @ssl = { crt: crt, key: key }
     end
   end
 end

@@ -224,6 +224,24 @@ spec:
           restartPolicy: Never
 <%- end -%>
 
+<%- if @options[:ssl] -%>
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ssl
+  namespace: <%= @options[:app] %>
+  labels:
+    app.kubernetes.io/name: <%= @options[:app] %>
+    app.kubernetes.io/instance: <%= @options[:instance] %>
+    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/managed-by: cuber
+data:
+  tls.crt: <%= Base64.strict_encode64 File.read @options[:ssl][:crt] %>
+  tls.key: <%= Base64.strict_encode64 File.read @options[:ssl][:key] %>
+type: kubernetes.io/tls
+<%- end -%>
+
 ---
 apiVersion: v1
 kind: Service
@@ -247,4 +265,8 @@ spec:
   - name: http
     protocol: TCP
     port: 80
+    targetPort: 3000
+  - name: https
+    protocol: TCP
+    port: 443
     targetPort: 3000
