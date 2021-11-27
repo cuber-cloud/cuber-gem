@@ -143,6 +143,9 @@ spec:
         - secretRef:
             name: app-secrets
         <%- if procname.to_s == 'web' -%>
+        env:
+        - name: PORT
+          value: "80"
         ports:
         - containerPort: 80
         readinessProbe:
