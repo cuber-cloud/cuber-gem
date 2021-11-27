@@ -242,6 +242,57 @@ data:
 type: kubernetes.io/tls
 <%- end -%>
 
+<%- if @options[:ingress] -%>
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+  namespace: <%= @options[:app] %>
+  labels:
+    app.kubernetes.io/name: <%= @options[:app] %>
+    app.kubernetes.io/instance: <%= @options[:instance] %>
+    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/managed-by: cuber
+spec:
+  selector:
+    app: web-proc
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ingress
+  namespace: <%= @options[:app] %>
+  labels:
+    app.kubernetes.io/name: <%= @options[:app] %>
+    app.kubernetes.io/instance: <%= @options[:instance] %>
+    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/managed-by: cuber
+  annotations:
+    <%- @options[:lb].each do |key, value| -%>
+    <%= key %>: <%= value.to_json %>
+    <%- end -%>
+spec:
+  <%- if @options[:ssl] -%>
+  tls:
+  - secretName: ssl
+  <%- end -%>
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-service
+            port:
+              number: 80
+<%- else -%>
 ---
 apiVersion: v1
 kind: Service
@@ -270,3 +321,4 @@ spec:
     protocol: TCP
     port: 443
     targetPort: 3000
+<%- end -%>

@@ -16,6 +16,7 @@ module Cuber
       @secrets = {}
       @env = {}
       @lb = {}
+      @ingress = nil
       @ssl = nil
     end
 
@@ -77,6 +78,10 @@ module Cuber
 
     def lb key, value
       @lb[key] = value
+    end
+
+    def ingress enabled
+      @ingress = enabled
     end
 
     def ssl crt, key
