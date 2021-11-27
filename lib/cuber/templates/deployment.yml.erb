@@ -137,14 +137,14 @@ spec:
         <%- else -%>
         command: <%= proc[:cmd].shellsplit %>
         <%- end -%>
-        ports:
-        - containerPort: 80
         envFrom:
         - configMapRef:
             name: env
         - secretRef:
             name: app-secrets
         <%- if procname.to_s == 'web' -%>
+        ports:
+        - containerPort: 80
         readinessProbe:
           httpGet:
             path: /
