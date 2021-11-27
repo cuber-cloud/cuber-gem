@@ -138,7 +138,7 @@ spec:
         command: <%= proc[:cmd].shellsplit %>
         <%- end -%>
         ports:
-        - containerPort: 3000
+        - containerPort: 80
         envFrom:
         - configMapRef:
             name: env
@@ -148,7 +148,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /
-            port: 3000
+            port: 80
         <%- end -%>
       <%- if @options[:migrate] && @options[:migrate][:check] -%>
       initContainers:
@@ -261,7 +261,7 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 3000
+      targetPort: 80
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -317,9 +317,9 @@ spec:
   - name: http
     protocol: TCP
     port: 80
-    targetPort: 3000
+    targetPort: 80
   - name: https
     protocol: TCP
     port: 443
-    targetPort: 3000
+    targetPort: 80
 <%- end -%>
