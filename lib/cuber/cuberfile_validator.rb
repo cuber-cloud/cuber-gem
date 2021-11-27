@@ -20,6 +20,9 @@ module Cuber
       validate_procs
       validate_cron
       validate_env
+      validate_lb
+      validate_ingress
+      validate_ssl
       @errors
     end
 
@@ -93,6 +96,23 @@ module Cuber
       @options[:env].merge(@options[:secrets]).each do |key, value|
         @errors << "env \"#{key}\" name can only include uppercase letters, digits or underscores" if key !~ /\A[A-Z_]+[A-Z0-9_]*\z/
       end
+    end
+
+    def validate_lb
+      @options[:lb].each do |key, value|
+        @errors << "lb \"#{key}\" key can only include letters, digits, underscores, dashes, dots or slash" if key !~ /\A[a-zA-Z0-9_\-\.\/]+\z/
+      end
+    end
+
+    def validate_ingress
+      return unless @options[:ingress]
+      @errors << 'ingress must be true or false' if @options[:ingress] != true && @options[:ingress] != false
+    end
+
+    def validate_ssl
+      return unless @options[:ssl]
+      @errors << 'ssl crt must be a file' unless File.exists? @options[:ssl][:crt]
+      @errors << 'ssl key must be a file' unless File.exists? @options[:ssl][:key]
     end
 
   end
