@@ -38,7 +38,11 @@ module Cuber::Commands
 
     def print_public_ip
       print_section 'Public IP'
-      json = kubeget 'service', 'load-balancer'
+      if @namespace['metadata']['annotations']['ingress']
+        json = kubeget 'ingress', 'web-ingress'
+      else
+        json = kubeget 'service', 'load-balancer'
+      end
       puts "#{json['status']['loadBalancer']['ingress'][0]['ip']}"
     end
 

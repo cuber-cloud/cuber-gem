@@ -10,6 +10,7 @@ metadata:
   annotations:
     image: <%= @options[:image] %>
     buildpacks: <%= @options[:buildpacks] %>
+    ingress: <%= 'enabled' if @options[:ingress] %>
 
 ---
 apiVersion: v1
