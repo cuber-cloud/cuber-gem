@@ -142,8 +142,12 @@ spec:
             name: env
         - secretRef:
             name: app-secrets
-        <%- if procname.to_s == 'web' -%>
         env:
+        <%- proc[:env].each do |key, value| -%>
+        - name: <%= key %>
+          value: <%= value.to_json %>
+        <%- end -%>
+        <%- if procname.to_s == 'web' -%>
         - name: PORT
           value: "8080"
         ports:

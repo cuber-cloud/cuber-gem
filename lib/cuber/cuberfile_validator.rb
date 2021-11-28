@@ -81,6 +81,9 @@ module Cuber
         @errors << "proc \"#{procname}\" name can only include lowercase letters" if procname !~ /\A[a-z]+\z/
         @errors << "proc \"#{procname}\" command must be present" if proc[:cmd].to_s.strip.empty?
         @errors << "proc \"#{procname}\" scale must be a positive number" unless proc[:scale].is_a?(Integer) && proc[:scale] > 0
+        proc[:env].each do |key, value|
+          @errors << "proc \"#{procname}\" env name can only include uppercase letters, digits or underscores" if key !~ /\A[A-Z_]+[A-Z0-9_]*\z/
+        end
       end
     end
 
