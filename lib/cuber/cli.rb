@@ -13,7 +13,6 @@ module Cuber
 
     def initialize
       @options = {}
-      parse_options!
       parse_command!
       parse_cuberfile
       validate_cuberfile
@@ -21,15 +20,6 @@ module Cuber
     end
 
     private
-
-    def parse_options!
-      OptionParser.new do |opts|
-        opts.banner = 'Usage: cuber [OPTIONS] COMMAND'
-        opts.on('-e', '--environment ENVIRONMENT', 'Set the environment (e.g. production)') do |e|
-          @options[:environment] = e
-        end
-      end.parse!
-    end
 
     def parse_command!
       @options[:cmd] = ARGV.shift&.to_sym
