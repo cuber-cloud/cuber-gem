@@ -6,6 +6,6 @@ Gem::Specification.new do |s|
   s.summary = 'Cuber'
   s.author = 'Cuber'
   s.executables = ['cuber']
-  s.files = ['bin/cuber', 'lib/cuber.rb']
+  s.files = `git ls-files`.split("\n")
   s.metadata['allowed_push_host'] = 'https://rubygems.pkg.github.com/cuber-cloud'
 end
