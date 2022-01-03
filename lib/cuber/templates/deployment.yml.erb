@@ -8,9 +8,9 @@ metadata:
     app.kubernetes.io/version: <%= @options[:release] %>
     app.kubernetes.io/managed-by: cuber
   annotations:
-    image: <%= @options[:image] %>
-    buildpacks: <%= @options[:buildpacks] %>
-    ingress: <%= 'enabled' if @options[:ingress] %>
+    image: <%= @options[:image].to_s.to_json %>
+    buildpacks: <%= @options[:buildpacks].to_s.to_json %>
+    ingress: <%= @options[:ingress].to_s.to_json %>
 
 ---
 apiVersion: v1
@@ -56,7 +56,7 @@ metadata:
     app.kubernetes.io/managed-by: cuber
 data:
   <%- @options[:env].each do |key, value| -%>
-  <%= key %>: <%= value.to_json %>
+  <%= key %>: <%= value.to_s.to_json %>
   <%- end -%>
 
 <%- if @options[:migrate] -%>
@@ -145,7 +145,7 @@ spec:
         env:
         <%- proc[:env].each do |key, value| -%>
         - name: <%= key %>
-          value: <%= value.to_json %>
+          value: <%= value.to_s.to_json %>
         <%- end -%>
         <%- if procname.to_s == 'web' -%>
         - name: PORT
@@ -191,7 +191,7 @@ metadata:
     app.kubernetes.io/version: <%= @options[:release] %>
     app.kubernetes.io/managed-by: cuber
 spec:
-  schedule: <%= cron[:schedule].to_json %>
+  schedule: <%= cron[:schedule].to_s.to_json %>
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
@@ -283,7 +283,7 @@ metadata:
     app.kubernetes.io/managed-by: cuber
   annotations:
     <%- @options[:lb].each do |key, value| -%>
-    <%= key %>: <%= value.to_json %>
+    <%= key %>: <%= value.to_s.to_json %>
     <%- end -%>
 spec:
   <%- if @options[:ssl] -%>
@@ -314,7 +314,7 @@ metadata:
     app.kubernetes.io/managed-by: cuber
   annotations:
     <%- @options[:lb].each do |key, value| -%>
-    <%= key %>: <%= value.to_json %>
+    <%= key %>: <%= value.to_s.to_json %>
     <%- end -%>
 spec:
   type: LoadBalancer
