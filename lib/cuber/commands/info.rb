@@ -43,7 +43,12 @@ module Cuber::Commands
       else
         json = kubeget 'service', 'load-balancer'
       end
-      puts "#{json['status']['loadBalancer']['ingress'][0]['ip']}"
+      ip = json.dig 'status', 'loadBalancer', 'ingress', 0, 'ip'
+      if ip
+        puts "#{ip}"
+      else
+        puts "None detected"
+      end
     end
 
     def print_env
