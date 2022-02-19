@@ -9,6 +9,5 @@ Gem::Specification.new do |s|
   s.license = 'LicenseRef-LICENSE.md'
   s.executables = ['cuber']
   s.files = `git ls-files`.split("\n")
-  s.metadata['allowed_push_host'] = 'https://rubygems.pkg.github.com/cuber-cloud'
   s.add_dependency 'jwt'
 end
