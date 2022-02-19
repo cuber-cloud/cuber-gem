@@ -7,6 +7,8 @@ require 'yaml'
 require 'json'
 require 'shellwords'
 require 'time'
+require 'openssl'
+require 'jwt'
 
 module Cuber
   class CLI
