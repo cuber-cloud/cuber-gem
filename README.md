@@ -6,7 +6,19 @@
 
 Deploy your apps on Kubernetes easily.
 
-[What is Cuber?](https://cuber.cloud/docs/overview)
+## What is Cuber?
+
+Cuber is an automation tool (written in Ruby) that can package and deploy your apps (written in any language and framework) on Kubernetes.
+
+Unlike other tools that add more options and more complexity to Kubernetes, Cuber is made to simplify and reduce the complexity.
+
+Kubernetes is up to 80% cheaper compared to PaaS like Heroku and you can choose between different cloud providers (no lock-in).
+It is also reliable and it can scale enterprise applications at any size.
+The only downside is that it's difficult to master...
+Cuber makes Kubernetes simple!
+In this way you have the simplicity of a PaaS, at the cost of bare infrastructure and without the additional cost of a DevOp team.
+
+[Read more](https://cuber.cloud/docs/overview)
 
 ## Installation
 
