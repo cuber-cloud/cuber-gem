@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.summary = 'Deploy your apps on Kubernetes easily.'
   s.author = 'Cuber'
   s.homepage = 'https://cuber.cloud'
-  s.license = 'LicenseRef-LICENSE.md'
+  s.license = 'LicenseRef-SSAL-LICENSE'
   s.executables = ['cuber']
   s.files = `git ls-files`.split("\n")
   s.add_dependency 'jwt'

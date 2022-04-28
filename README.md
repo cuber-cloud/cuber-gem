@@ -70,6 +70,15 @@ $ cuber info
 
 Check out the [Cuberfile configuration](https://cuber.cloud/docs/cuberfile) and the [Cuber CLI commands](https://cuber.cloud/docs/cli) for more information.
 
+## License
+
+Cuber is released under a source-available license:
+[Standard Source Available License (SSAL)](https://github.com/collimarco/Standard-Source-Available-License)
+
+Cuber is completely free up to 5 procs per app. If you are a large customer, and you need more procs, please [purchase a license](https://cuber.cloud/buy) (it also includes dedicated support).
+
+Contributions are welcome: you can fork this project on GitHub and submit a pull request. If you submit a change / fix, we can use it without restrictions and you transfer the copyright of your contribution to Cuber.
+
 ## Learn more
 
 You can find more information and documentation on [cuber.cloud →](https://cuber.cloud)
