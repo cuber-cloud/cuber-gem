@@ -36,7 +36,10 @@ module Cuber::Commands
       path = '.cuber/repo'
       FileUtils.mkdir_p path
       FileUtils.rm_rf path, secure: true
-      system('git', 'clone', '--depth', '1', @options[:repo], path) || abort('Cuber: git clone failed')
+      cmd = ['git', 'clone']
+      cmd += ['--branch', @options[:repo][:branch]] if @options[:repo][:branch]
+      cmd += ['--depth', '1', @options[:repo][:url], path]
+      system(*cmd) || abort('Cuber: git clone failed')
     end
 
     def commit_hash

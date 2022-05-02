@@ -32,8 +32,8 @@ module Cuber
       @release = version
     end
 
-    def repo uri
-      @repo = uri
+    def repo url, branch: nil
+      @repo = { url: url, branch: branch }
     end
 
     def buildpacks builder

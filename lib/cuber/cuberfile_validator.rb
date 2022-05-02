@@ -41,7 +41,7 @@ module Cuber
     end
 
     def validate_repo
-      @errors << 'repo must be present' if @options[:repo].to_s.strip.empty?
+      @errors << 'repo must be present' if @options[:repo].nil? || @options[:repo][:url].to_s.strip.empty?
     end
 
     def validate_buildpacks
