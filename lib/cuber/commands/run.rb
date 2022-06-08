@@ -35,7 +35,7 @@ module Cuber::Commands
       @options[:pod] = "pod-#{command.downcase.gsub(/[^a-z0-9]+/, '-')}-#{Time.now.utc.iso8601.delete('^0-9')}"
       path = ".cuber/kubernetes/#{@options[:pod]}.yml"
       full_command = command.shellsplit
-      full_command.unshift 'launcher' if @options[:buildpacks]
+      full_command.unshift 'launcher' unless @options[:buildpacks].to_s.strip.empty?
       render 'pod.yml', path
       kubectl 'apply', '-f', path
       kubectl 'wait', '--for', 'condition=ready', "pod/#{@options[:pod]}"
