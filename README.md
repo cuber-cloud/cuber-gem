@@ -10,14 +10,15 @@ Deploy your apps on Kubernetes easily.
 
 Cuber is an automation tool (written in Ruby) that can package and deploy your apps (written in any language and framework) on Kubernetes.
 
-Unlike other tools that add more options and more complexity to Kubernetes, Cuber is made to simplify and reduce the complexity.
+Unlike other tools that add more options and more complexity to Kubernetes, Cuber is made to simplify and reduce the complexity, thus making the deployment process more standardized and reliable.
+
 You just need to create a `Cuberfile`, with ~10 lines of code, and then type `cuber deploy` to package and deploy your app on any Kubernetes cluster.
 
 Kubernetes is up to 80% cheaper compared to PaaS like Heroku and you can choose between different cloud providers (no lock-in).
-It is also reliable and it can scale enterprise applications at any size.
-The only downside is that it's difficult to master...
-Cuber makes Kubernetes simple!
-In this way you have the simplicity of a PaaS, at the cost of bare infrastructure and without the additional cost of a DevOps team.
+It is also reliable and it can scale applications of any size.
+The only downside is that it's complex and requires many steps and configurations, even if most applications share the same needs...
+Cuber makes Kubernetes simple and more concise.
+In this way you have the simplicity of a PaaS, at the cost of bare infrastructure.
 
 [Read more](https://cuber.cloud/docs/overview)
 
@@ -76,7 +77,7 @@ Check out the [Cuberfile configuration](https://cuber.cloud/docs/cuberfile) and 
 Cuber is released under a source-available license:
 [Standard Source Available License (SSAL)](https://github.com/collimarco/Standard-Source-Available-License)
 
-Cuber is completely free up to 5 procs per app (and you can publish unlimited apps). If you are a large customer, and you need more procs to scale your applications, please [purchase a license](https://cuber.cloud/buy) (it also includes dedicated support).
+Cuber is completely free up to 5 procs per app and you can publish unlimited apps. If you need more procs to scale your applications, please [purchase a license](https://cuber.cloud/buy) (it also includes dedicated support).
 
 Contributions are welcome: you can fork this project on GitHub and submit a pull request. If you submit a change / fix, we can use it without restrictions and you transfer the copyright of your contribution to Cuber.
 
