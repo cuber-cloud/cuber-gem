@@ -103,6 +103,16 @@ module Cuber
       end
     end
 
+    def validate_hostalias
+      @options[:hostaliases].each do |ip, hostnames|
+        @errors << "hostalias \"#{ip}\" must be a valid ip address" if ip !~ /\A\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/
+        @errors << "hostalias \"#{ip}\" must define at least one hostname" if hostnames.empty?
+        hostnames.each do |hostname|
+          @errors << "hostalias \"#{ip}\" hostname \"#{hostname}\" can only include lowercase letters, digits, dots or dashes" if hostname !~ /\A[a-z0-9\-\.]+\z/
+        end
+      end
+    end
+
     def validate_lb
       @options[:lb].each do |key, value|
         @errors << "lb \"#{key}\" key can only include letters, digits, underscores, dashes, dots or slash" if key !~ /\A[a-zA-Z0-9_\-\.\/]+\z/
