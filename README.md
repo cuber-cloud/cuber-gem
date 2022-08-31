@@ -74,14 +74,9 @@ Check out the [Cuberfile configuration](https://cuber.cloud/docs/cuberfile) and 
 
 ## License
 
-Cuber is released under a source-available license:
-[Standard Source Available License (SSAL)](https://github.com/collimarco/Standard-Source-Available-License)
-
-Cuber is completely free up to 5 procs per app and you can publish unlimited apps. If you need more procs to scale your applications, please [purchase a license](https://cuber.cloud/buy) (it also includes dedicated support).
-
-Contributions are welcome: you can fork this project on GitHub and submit a pull request. If you submit a change / fix, we can use it without restrictions and you transfer the copyright of your contribution to Cuber.
+Cuber is released under the [Apache-2.0 license](https://opensource.org/licenses/Apache-2.0).
 
 ## Learn more
 
-You can find more information and documentation on [cuber.cloud →](https://cuber.cloud)
+You can find more information and documentation on [cuber.cloud](https://cuber.cloud).
 

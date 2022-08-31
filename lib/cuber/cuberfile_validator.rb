@@ -23,8 +23,6 @@ module Cuber
       validate_lb
       validate_ingress
       validate_ssl
-      validate_key
-      validate_limits
       @errors
     end
 
@@ -119,28 +117,6 @@ module Cuber
       @errors << 'ssl crt must be a file' unless File.exists? @options[:ssl][:crt]
       @errors << 'ssl key must be a file' unless File.exists? @options[:ssl][:key]
     end
-    
-    def validate_key
-      return unless File.exists? File.expand_path '~/.cuber.key'
-      token = File.read File.expand_path '~/.cuber.key'
-      ecdsa_public = OpenSSL::PKey.read <<~PEM
-        -----BEGIN PUBLIC KEY-----
-        MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAERAh4uT9yojc06y5wgU6CY6sr0Hrv
-        P8AUw6uw2PgUdbm7DKkJwFvQYMj3g+TmrxmPV3KQ8uzegfYRbHr6DyonNQ==
-        -----END PUBLIC KEY-----
-      PEM
-      JWT.decode token, ecdsa_public, true, { iss: 'Cuber', verify_iss: true, algorithm: 'ES256' }
-    rescue JWT::DecodeError
-      @errors << 'your license key is invalid or expired'
-    end
-    
-    def validate_limits
-      return if File.exists? File.expand_path '~/.cuber.key'
-      scale = @options[:procs].collect { |procname, proc| proc[:scale].to_i }.sum
-      @errors << 'please purchase a license key or reduce the number of procs' if scale > 5 
-    end
 
   end
 end
-
-Cuber::CuberfileValidator.freeze
