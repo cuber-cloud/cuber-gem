@@ -80,6 +80,16 @@ spec:
         app.kubernetes.io/version: <%= @options[:release] %>
         app.kubernetes.io/managed-by: cuber
     spec:
+      <%- if @options[:hostaliases].any? -%>
+      hostAliases:
+      <%- @options[:hostaliases].each do |ip, hostnames| -%>
+      - ip: "<%= ip %>"
+        hostnames:
+        <%- hostnames.each do |hostname| -%>
+        - "<%= hostname %>"
+        <%- end -%>
+      <%- end -%>
+      <%- end -%>
       containers:
       - name: migration
         image: <%= @options[:image] %>:<%= @options[:release] %>
@@ -127,6 +137,16 @@ spec:
         app.kubernetes.io/managed-by: cuber
         app: <%= procname %>-proc
     spec:
+      <%- if @options[:hostaliases].any? -%>
+      hostAliases:
+      <%- @options[:hostaliases].each do |ip, hostnames| -%>
+      - ip: "<%= ip %>"
+        hostnames:
+        <%- hostnames.each do |hostname| -%>
+        - "<%= hostname %>"
+        <%- end -%>
+      <%- end -%>
+      <%- end -%>
       containers:
       - name: <%= procname %>-proc
         image: <%= @options[:image] %>:<%= @options[:release] %>
@@ -225,6 +245,16 @@ spec:
             app.kubernetes.io/version: <%= @options[:release] %>
             app.kubernetes.io/managed-by: cuber
         spec:
+          <%- if @options[:hostaliases].any? -%>
+          hostAliases:
+          <%- @options[:hostaliases].each do |ip, hostnames| -%>
+          - ip: "<%= ip %>"
+            hostnames:
+            <%- hostnames.each do |hostname| -%>
+            - "<%= hostname %>"
+            <%- end -%>
+          <%- end -%>
+          <%- end -%>
           containers:
           - name: task
             image: <%= @options[:image] %>:<%= @options[:release] %>

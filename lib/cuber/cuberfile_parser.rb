@@ -15,6 +15,7 @@ module Cuber
       @cron = {}
       @secrets = {}
       @env = {}
+      @hostaliases = {}
       @lb = {}
       @ingress = nil
       @ssl = nil
@@ -74,6 +75,10 @@ module Cuber
 
     def env key, value, secret: false
       secret ? (@secrets[key] = value) : (@env[key] = value)
+    end
+
+    def hostalias ip, hostnames: []
+      @hostaliases[ip] = hostnames
     end
 
     def lb key, value
