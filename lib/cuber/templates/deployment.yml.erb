@@ -137,6 +137,18 @@ spec:
         <%- else -%>
         command: <%= proc[:cmd].shellsplit %>
         <%- end -%>
+        resources:
+          requests:
+            <%- if proc[:cpu] -%>
+            cpu: <%= proc[:cpu] %>
+            <%- end -%>
+            <%- if proc[:ram] -%>
+            memory: <%= proc[:ram] %>Gi
+            <%- end -%>
+          limits:
+            <%- if proc[:ram] -%>
+            memory: <%= proc[:ram] %>Gi
+            <%- end -%>
         envFrom:
         - configMapRef:
             name: env

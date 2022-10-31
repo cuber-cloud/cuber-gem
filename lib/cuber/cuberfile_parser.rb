@@ -64,8 +64,8 @@ module Cuber
       @migrate = { cmd: cmd, check: check }
     end
 
-    def proc name, cmd, scale: 1, term: 60, env: {}
-      @procs[name] = { cmd: cmd, scale: scale, term: term, env: env }
+    def proc name, cmd, scale: 1, cpu: nil, ram: nil, term: 60, env: {}
+      @procs[name] = { cmd: cmd, scale: scale, cpu: cpu, ram: ram, term: term, env: env }
     end
 
     def cron name, schedule, cmd
