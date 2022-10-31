@@ -109,8 +109,8 @@ module Cuber::Commands
         name = pod['metadata']['name']
         created_at = pod['metadata']['creationTimestamp']
         pod_status = pod['status']['phase']
-        container_ready = pod['status']['containerStatuses'][0]['ready']
-        container_status = pod['status']['containerStatuses'][0]['state'].values.first['reason']
+        container_ready = pod.dig('status', 'containerStatuses', 0, 'ready')
+        container_status = pod.dig('status', 'containerStatuses', 0, 'state')&.values&.first&.[]('reason')
         if pod_status == 'Succeeded' || (pod_status == 'Running' && container_ready)
           puts "#{name}: \e[32m#{container_status || pod_status}\e[0m (#{time_ago_in_words created_at})"
         else
