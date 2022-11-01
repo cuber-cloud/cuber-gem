@@ -9,6 +9,7 @@ require 'cuber/commands/logs'
 require 'cuber/commands/restart'
 require 'cuber/commands/run'
 require 'cuber/commands/deploy'
+require 'cuber/commands/ctl'
 
 module Cuber
 
