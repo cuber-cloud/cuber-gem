@@ -164,10 +164,15 @@ spec:
           value: "8080"
         ports:
         - containerPort: 8080
+        <%- end -%>
+        <%- if procname.to_s == 'web' && @options[:health] -%>
         readinessProbe:
           httpGet:
-            path: /
+            path: <%= URI.parse(@options[:health]).path.to_json %>
             port: 8080
+            httpHeaders:
+              - name: Host
+                value: <%= URI.parse(@options[:health]).host.to_json %>
         <%- end -%>
       <%- if @options[:migrate] && @options[:migrate][:check] -%>
       initContainers:

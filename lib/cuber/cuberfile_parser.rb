@@ -15,6 +15,7 @@ module Cuber
       @cron = {}
       @secrets = {}
       @env = {}
+      @health = nil
       @lb = {}
       @ingress = nil
       @ssl = nil
@@ -74,6 +75,10 @@ module Cuber
 
     def env key, value, secret: false
       secret ? (@secrets[key] = value) : (@env[key] = value)
+    end
+    
+    def health url
+      @health = url
     end
 
     def lb key, value

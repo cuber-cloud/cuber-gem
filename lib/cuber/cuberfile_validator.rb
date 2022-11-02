@@ -20,6 +20,7 @@ module Cuber
       validate_procs
       validate_cron
       validate_env
+      validate_health
       validate_lb
       validate_ingress
       validate_ssl
@@ -102,6 +103,11 @@ module Cuber
       @options[:env].merge(@options[:secrets]).each do |key, value|
         @errors << "env \"#{key}\" name can only include uppercase letters, digits or underscores" if key !~ /\A[A-Z_]+[A-Z0-9_]*\z/
       end
+    end
+    
+    def validate_health
+      return unless @options[:health]
+      @errors << 'health checks must be an http url' unless URI.parse(@options[:health]).kind_of? URI::HTTP
     end
 
     def validate_lb
