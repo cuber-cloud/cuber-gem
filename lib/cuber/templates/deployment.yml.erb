@@ -168,11 +168,13 @@ spec:
         <%- if procname.to_s == 'web' && @options[:health] -%>
         readinessProbe:
           httpGet:
-            path: <%= URI.parse(@options[:health]).path.to_json %>
             port: 8080
+            path: <%= URI.parse(@options[:health]).path.to_json %>
             httpHeaders:
               - name: Host
                 value: <%= URI.parse(@options[:health]).host.to_json %>
+              - name: X-Forwarded-Proto
+                value: <%= URI.parse(@options[:health]).scheme.to_json %>
         <%- end -%>
       <%- if @options[:migrate] && @options[:migrate][:check] -%>
       initContainers:
