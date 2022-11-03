@@ -50,7 +50,7 @@ module Cuber
 
     def validate_dockerfile
       return unless @options[:dockerfile]
-      @errors << 'dockerfile must be a file' unless File.exists? @options[:dockerfile]
+      @errors << 'dockerfile must be a file' unless File.exist? @options[:dockerfile]
     end
 
     def validate_image
@@ -64,12 +64,12 @@ module Cuber
 
     def validate_dockerconfig
       return unless @options[:dockerconfig]
-      @errors << 'dockerconfig must be a file' unless File.exists? @options[:dockerconfig]
+      @errors << 'dockerconfig must be a file' unless File.exist? @options[:dockerconfig]
     end
 
     def validate_kubeconfig
       @errors << 'kubeconfig must be present' if @options[:kubeconfig].to_s.strip.empty?
-      @errors << 'kubeconfig must be a file' unless File.exists? @options[:kubeconfig]
+      @errors << 'kubeconfig must be a file' unless File.exist? @options[:kubeconfig]
     end
 
     def validate_migrate
@@ -123,8 +123,8 @@ module Cuber
 
     def validate_ssl
       return unless @options[:ssl]
-      @errors << 'ssl crt must be a file' unless File.exists? @options[:ssl][:crt]
-      @errors << 'ssl key must be a file' unless File.exists? @options[:ssl][:key]
+      @errors << 'ssl crt must be a file' unless File.exist? @options[:ssl][:crt]
+      @errors << 'ssl key must be a file' unless File.exist? @options[:ssl][:key]
     end
 
   end

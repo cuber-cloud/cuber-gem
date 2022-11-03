@@ -27,7 +27,7 @@ module Cuber
     end
 
     def parse_cuberfile
-      abort 'Cuberfile not found in current directory' unless File.exists? 'Cuberfile'
+      abort 'Cuberfile not found in current directory' unless File.exist? 'Cuberfile'
       content = File.read 'Cuberfile'
       parser = CuberfileParser.new
       parser.instance_eval(content)
