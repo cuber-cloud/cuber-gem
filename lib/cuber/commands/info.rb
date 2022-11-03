@@ -98,7 +98,7 @@ module Cuber::Commands
         schedule = cron['spec']['schedule']
         command = cron['spec']['jobTemplate']['spec']['template']['spec']['containers'][0]['command'].shelljoin
         last = cron['status']['lastScheduleTime']
-        puts "#{name}: #{schedule} #{command} (#{time_ago_in_words last})"
+        puts "#{name}: #{schedule} #{command} #{'(' + time_ago_in_words(last) + ')' if last}"
       end
     end
 
