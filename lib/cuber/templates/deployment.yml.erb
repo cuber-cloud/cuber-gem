@@ -59,6 +59,23 @@ data:
   <%= key %>: <%= value.to_s.to_json %>
   <%- end -%>
 
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web-pdb
+  namespace: <%= @options[:app] %>
+  labels:
+    app.kubernetes.io/name: <%= @options[:app] %>
+    app.kubernetes.io/instance: <%= @options[:instance] %>
+    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/managed-by: cuber
+spec:
+  maxUnavailable: "50%"
+  selector:
+    matchLabels:
+      app: web-proc
+
 <%- if @options[:migrate] -%>
 ---
 apiVersion: batch/v1
