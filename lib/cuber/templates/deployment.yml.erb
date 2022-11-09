@@ -3,9 +3,9 @@ apiVersion: v1
 metadata:
   name: <%= @options[:app] %>
   labels:
-    app.kubernetes.io/name: <%= @options[:app] %>
-    app.kubernetes.io/instance: <%= @options[:instance] %>
-    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
     app.kubernetes.io/managed-by: cuber
   annotations:
     image: <%= @options[:image].to_s.to_json %>
@@ -19,9 +19,9 @@ metadata:
   name: regcred
   namespace: <%= @options[:app] %>
   labels:
-    app.kubernetes.io/name: <%= @options[:app] %>
-    app.kubernetes.io/instance: <%= @options[:instance] %>
-    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
     app.kubernetes.io/managed-by: cuber
 data:
   .dockerconfigjson: <%= @options[:dockerconfigjson] %>
@@ -34,9 +34,9 @@ metadata:
   name: app-secrets
   namespace: <%= @options[:app] %>
   labels:
-    app.kubernetes.io/name: <%= @options[:app] %>
-    app.kubernetes.io/instance: <%= @options[:instance] %>
-    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
     app.kubernetes.io/managed-by: cuber
 data:
   <%- @options[:secrets].each do |key, value| -%>
@@ -50,9 +50,9 @@ metadata:
   name: env
   namespace: <%= @options[:app] %>
   labels:
-    app.kubernetes.io/name: <%= @options[:app] %>
-    app.kubernetes.io/instance: <%= @options[:instance] %>
-    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
     app.kubernetes.io/managed-by: cuber
 data:
   <%- @options[:env].each do |key, value| -%>
@@ -66,9 +66,9 @@ metadata:
   name: web-pdb
   namespace: <%= @options[:app] %>
   labels:
-    app.kubernetes.io/name: <%= @options[:app] %>
-    app.kubernetes.io/instance: <%= @options[:instance] %>
-    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
     app.kubernetes.io/managed-by: cuber
 spec:
   maxUnavailable: "50%"
@@ -84,17 +84,17 @@ metadata:
   name: migrate-<%= @options[:instance] %>
   namespace: <%= @options[:app] %>
   labels:
-    app.kubernetes.io/name: <%= @options[:app] %>
-    app.kubernetes.io/instance: <%= @options[:instance] %>
-    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
     app.kubernetes.io/managed-by: cuber
 spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: <%= @options[:app] %>
-        app.kubernetes.io/instance: <%= @options[:instance] %>
-        app.kubernetes.io/version: <%= @options[:release] %>
+        app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+        app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+        app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
         app.kubernetes.io/managed-by: cuber
     spec:
       containers:
@@ -125,9 +125,9 @@ metadata:
   name: <%= procname %>
   namespace: <%= @options[:app] %>
   labels:
-    app.kubernetes.io/name: <%= @options[:app] %>
-    app.kubernetes.io/instance: <%= @options[:instance] %>
-    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
     app.kubernetes.io/managed-by: cuber
 spec:
   revisionHistoryLimit: 0
@@ -138,9 +138,9 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: <%= @options[:app] %>
-        app.kubernetes.io/instance: <%= @options[:instance] %>
-        app.kubernetes.io/version: <%= @options[:release] %>
+        app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+        app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+        app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
         app.kubernetes.io/managed-by: cuber
         app: <%= procname %>-proc
     spec:
@@ -223,9 +223,9 @@ metadata:
   name: cron-<%= jobname %>
   namespace: <%= @options[:app] %>
   labels:
-    app.kubernetes.io/name: <%= @options[:app] %>
-    app.kubernetes.io/instance: <%= @options[:instance] %>
-    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
     app.kubernetes.io/managed-by: cuber
 spec:
   schedule: <%= cron[:schedule].to_s.to_json %>
@@ -235,18 +235,18 @@ spec:
   jobTemplate:
     metadata:
       labels:
-        app.kubernetes.io/name: <%= @options[:app] %>
-        app.kubernetes.io/instance: <%= @options[:instance] %>
-        app.kubernetes.io/version: <%= @options[:release] %>
+        app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+        app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+        app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
         app.kubernetes.io/managed-by: cuber
     spec:
       backoffLimit: 0
       template:
         metadata:
           labels:
-            app.kubernetes.io/name: <%= @options[:app] %>
-            app.kubernetes.io/instance: <%= @options[:instance] %>
-            app.kubernetes.io/version: <%= @options[:release] %>
+            app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+            app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+            app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
             app.kubernetes.io/managed-by: cuber
         spec:
           containers:
@@ -277,9 +277,9 @@ metadata:
   name: ssl
   namespace: <%= @options[:app] %>
   labels:
-    app.kubernetes.io/name: <%= @options[:app] %>
-    app.kubernetes.io/instance: <%= @options[:instance] %>
-    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
     app.kubernetes.io/managed-by: cuber
 data:
   tls.crt: <%= Base64.strict_encode64 File.read @options[:ssl][:crt] %>
@@ -295,9 +295,9 @@ metadata:
   name: web-service
   namespace: <%= @options[:app] %>
   labels:
-    app.kubernetes.io/name: <%= @options[:app] %>
-    app.kubernetes.io/instance: <%= @options[:instance] %>
-    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
     app.kubernetes.io/managed-by: cuber
 spec:
   selector:
@@ -314,9 +314,9 @@ metadata:
   name: web-ingress
   namespace: <%= @options[:app] %>
   labels:
-    app.kubernetes.io/name: <%= @options[:app] %>
-    app.kubernetes.io/instance: <%= @options[:instance] %>
-    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
     app.kubernetes.io/managed-by: cuber
   annotations:
     <%- @options[:lb].each do |key, value| -%>
@@ -345,9 +345,9 @@ metadata:
   name: load-balancer
   namespace: <%= @options[:app] %>
   labels:
-    app.kubernetes.io/name: <%= @options[:app] %>
-    app.kubernetes.io/instance: <%= @options[:instance] %>
-    app.kubernetes.io/version: <%= @options[:release] %>
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
     app.kubernetes.io/managed-by: cuber
   annotations:
     <%- @options[:lb].each do |key, value| -%>
