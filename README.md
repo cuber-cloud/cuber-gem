@@ -72,6 +72,12 @@ $ cuber info
 
 Check out the [Cuberfile configuration](https://cuber.cloud/docs/cuberfile) and the [Cuber CLI commands](https://cuber.cloud/docs/cli) for more information.
 
+## Production-ready
+
+Cuber has been used in production for [Pushpad](https://pushpad.xyz) for over a year and it is stable and reliable.
+
+Cuber has all the features needed for deploying applications on Kubernetes and it is used every day for several projects.
+
 ## License
 
 Cuber is released under the [Apache-2.0 license](https://opensource.org/licenses/Apache-2.0).
