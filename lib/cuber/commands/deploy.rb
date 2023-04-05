@@ -62,7 +62,7 @@ module Cuber::Commands
 
     def build
       print_step 'Building image from Dockerfile'
-      dockerfile = @options[:dockerfile] || 'Dockerfile'
+      dockerfile = File.expand_path(@options[:dockerfile] || 'Dockerfile')
       tag = "#{@options[:image]}:#{@options[:release]}"
       cmd = ['docker', 'build']
       cmd += ['--pull', '--no-cache'] if @options[:cache] == false
