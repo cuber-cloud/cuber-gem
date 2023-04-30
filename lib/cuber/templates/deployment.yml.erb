@@ -149,6 +149,9 @@ spec:
         app.kubernetes.io/managed-by: cuber
         app: <%= procname %>-proc
     spec:
+      <%- if proc[:node_name] -%>
+      nodeName: <%= proc[:node_name]%>
+      <%- end -%>
       containers:
       - name: <%= procname %>-proc
         image: <%= @options[:image] %>:<%= @options[:release] %>
