@@ -149,8 +149,9 @@ spec:
         app.kubernetes.io/managed-by: cuber
         app: <%= procname %>-proc
     spec:
-      <%- if proc[:node_name] -%>
-      nodeName: <%= proc[:node_name]%>
+      <%- if proc[:node_pool_key] && proc[:node_pool_name] -%>
+      nodeSelector:
+        <%= proc[:node_pool_key] %>: <%= proc[:node_pool_name]%>
       <%- end -%>
       containers:
       - name: <%= procname %>-proc

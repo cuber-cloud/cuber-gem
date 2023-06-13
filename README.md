@@ -72,6 +72,10 @@ $ cuber info
 
 Check out the [Cuberfile configuration](https://cuber.cloud/docs/cuberfile) and the [Cuber CLI commands](https://cuber.cloud/docs/cli) for more information.
 
+## Node Pool Keys
+GKE: cloud.google.com/gke-nodepool
+Digital Ocean: doks.digitalocean.com/node-pool
+
 ## Production-ready
 
 Cuber has been used in production for [Pushpad](https://pushpad.xyz) for over a year and it is stable and reliable.
@@ -85,4 +89,3 @@ Cuber is released under the [Apache-2.0 license](https://opensource.org/licenses
 ## Learn more
 
 You can find more information and documentation on [cuber.cloud](https://cuber.cloud).
-
