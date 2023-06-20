@@ -13,9 +13,11 @@ module Cuber
   class CLI
 
     def initialize
+      file_path = ARGV[1] || 'Cuberfile'
+
       @options = {}
       parse_command!
-      parse_cuberfile
+      parse_cuberfile(file_path)
       validate_cuberfile
       execute
     end
@@ -26,9 +28,9 @@ module Cuber
       @options[:cmd] = ARGV.shift&.to_sym
     end
 
-    def parse_cuberfile
-      abort 'Cuberfile not found in current directory' unless File.exist? 'Cuberfile'
-      content = File.read 'Cuberfile'
+    def parse_cuberfile(file_path)
+      abort 'Cuberfile not found in current directory' unless File.exist? file_path
+      content = File.read file_path
       parser = CuberfileParser.new
       parser.instance_eval(content)
       cuberfile_options = parser.instance_variables.map do |name|
