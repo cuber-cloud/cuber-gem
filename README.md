@@ -78,9 +78,9 @@ Digital Ocean: doks.digitalocean.com/node-pool
 
 ## Production-ready
 
-Cuber has been used in production for [Pushpad](https://pushpad.xyz) for over a year and it is stable and reliable.
+We have built Cuber for scaling [Pushpad](https://pushpad.xyz). Cuber has been used in production for over a year and it is stable and reliable. We had 100% uptime and we saved 80% on cloud costs.
 
-Cuber has all the features needed for deploying applications on Kubernetes and it is used every day for several projects.
+Cuber is a mature project that has all the features needed for deploying applications on Kubernetes and it is used every day for several projects.
 
 ## License
 
