@@ -100,7 +100,7 @@ spec:
       containers:
       - name: migration
         image: <%= @options[:image] %>:<%= @options[:release] %>
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         <%- if @options[:buildpacks] -%>
         command: ["launcher"]
         args: <%= @options[:migrate][:cmd].shellsplit %>
@@ -152,7 +152,7 @@ spec:
       containers:
       - name: <%= procname %>-proc
         image: <%= @options[:image] %>:<%= @options[:release] %>
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         <%- if @options[:buildpacks] -%>
         command: ["launcher"]
         args: <%= proc[:cmd].shellsplit %>
@@ -202,7 +202,7 @@ spec:
       initContainers:
       - name: migration-check
         image: <%= @options[:image] %>:<%= @options[:release] %>
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         <%- if @options[:buildpacks] -%>
         command: ["launcher"]
         args: <%= @options[:migrate][:check].shellsplit %>
@@ -257,7 +257,7 @@ spec:
           containers:
           - name: task
             image: <%= @options[:image] %>:<%= @options[:release] %>
-            imagePullPolicy: Always
+            imagePullPolicy: IfNotPresent
             <%- if @options[:buildpacks] -%>
             command: ["launcher"]
             args: <%= cron[:cmd].shellsplit %>
