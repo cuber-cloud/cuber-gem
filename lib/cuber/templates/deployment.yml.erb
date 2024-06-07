@@ -197,6 +197,11 @@ spec:
                 value: <%= URI.parse(@options[:health]).host.to_json %>
               - name: X-Forwarded-Proto
                 value: <%= URI.parse(@options[:health]).scheme.to_json %>
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
         <%- end -%>
       <%- if @options[:migrate] && @options[:migrate][:check] -%>
       initContainers:
