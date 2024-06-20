@@ -81,7 +81,7 @@ module Cuber
       @options[:procs].each do |procname, proc|
         @errors << "proc \"#{procname}\" name can only include lowercase letters" if procname !~ /\A[a-z]+\z/
         @errors << "proc \"#{procname}\" command must be present" if proc[:cmd].to_s.strip.empty?
-        @errors << "proc \"#{procname}\" scale must be a positive number" unless proc[:scale].is_a?(Integer) && proc[:scale] > 0
+        @errors << "proc \"#{procname}\" scale must be a positive number or a range" unless (proc[:scale].is_a?(Integer) && proc[:scale] > 0) || (proc[:scale].is_a?(Range) && proc[:scale].minmax.all? { |m| m.is_a?(Integer) && m > 0 })
         @errors << "proc \"#{procname}\" cpu must be a positive number" unless proc[:cpu].nil? || proc[:cpu].is_a?(Numeric) && proc[:cpu] > 0
         @errors << "proc \"#{procname}\" ram must be a positive number" unless proc[:ram].nil? || proc[:ram].is_a?(Numeric) && proc[:ram] > 0  
         @errors << "proc \"#{procname}\" term must be a positive number" unless proc[:term].is_a?(Integer) && proc[:term] > 0

@@ -131,7 +131,7 @@ metadata:
     app.kubernetes.io/managed-by: cuber
 spec:
   revisionHistoryLimit: 0
-  replicas: <%= proc[:scale] %>
+  replicas: <%= proc[:scale].is_a?(Range) ? proc[:scale].min : proc[:scale] %>
   selector:
     matchLabels:
       app: <%= procname %>-proc
@@ -223,6 +223,34 @@ spec:
       imagePullSecrets:
       - name: regcred
       terminationGracePeriodSeconds: <%= proc[:term] %>
+<%- end -%>
+
+<%- @options[:procs].select { |procname, proc| proc[:scale].is_a?(Range) }.each do |procname, proc| -%>
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: scale-<%= procname %>
+  namespace: <%= @options[:app] %>
+  labels:
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
+    app.kubernetes.io/managed-by: cuber
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: <%= procname %>
+  minReplicas: <%= proc[:scale].min %>
+  maxReplicas: <%= proc[:scale].max %>
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 60
 <%- end -%>
 
 <%- @options[:cron].each do |jobname, cron| -%>
