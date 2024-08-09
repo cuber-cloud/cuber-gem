@@ -5,6 +5,7 @@ module Cuber
       @release = nil
       @repo = nil
       @buildpacks = nil
+      @buildargs = {}
       @dockerfile = nil
       @image = nil
       @cache = nil
@@ -43,6 +44,10 @@ module Cuber
 
     def dockerfile path
       @dockerfile = path
+    end
+
+    def buildarg key, value
+      @buildargs[key] = value
     end
 
     def image name
