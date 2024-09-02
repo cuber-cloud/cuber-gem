@@ -55,6 +55,8 @@ metadata:
     app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
     app.kubernetes.io/managed-by: cuber
 data:
+  CUBER_APP_NAME: <%= @options[:app].to_s.to_json %>
+  CUBER_RELEASE_VERSION: <%= @options[:release].to_s.to_json %>
   <%- @options[:env].each do |key, value| -%>
   <%= key %>: <%= value.to_s.to_json %>
   <%- end -%>
