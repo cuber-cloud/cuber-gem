@@ -19,6 +19,7 @@ module Cuber
       @lb = {}
       @ingress = nil
       @ssl = nil
+      @cluster_ip = nil
     end
 
     def method_missing m, *args
@@ -76,7 +77,7 @@ module Cuber
     def env key, value, secret: false
       secret ? (@secrets[key] = value) : (@env[key] = value)
     end
-    
+
     def health url
       @health = url
     end
@@ -87,6 +88,10 @@ module Cuber
 
     def ingress enabled
       @ingress = enabled
+    end
+
+    def cluster_ip enabled
+      @cluster_ip = enabled
     end
 
     def ssl crt, key

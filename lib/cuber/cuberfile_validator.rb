@@ -23,6 +23,7 @@ module Cuber
       validate_health
       validate_lb
       validate_ingress
+      validate_cluster_ip
       validate_ssl
       @errors
     end
@@ -119,6 +120,11 @@ module Cuber
     def validate_ingress
       return unless @options[:ingress]
       @errors << 'ingress must be true or false' if @options[:ingress] != true && @options[:ingress] != false
+    end
+
+    def validate_cluster_ip
+      return unless @options[:cluster_ip]
+      @errors << 'cluster_ip must be true or false' if @options[:cluster_ip] != true && @options[:cluster_ip] != false
     end
 
     def validate_ssl

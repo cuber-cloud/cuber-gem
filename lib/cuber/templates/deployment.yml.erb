@@ -377,6 +377,26 @@ spec:
             name: web-service
             port:
               number: 80
+<%- elsif @options[:cluster_ip] -%>
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cluster-ip
+  namespace: <%= @options[:app] %>
+  labels:
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
+    app.kubernetes.io/managed-by: cuber
+spec:
+  type: ClusterIP
+  selector:
+    app: web-proc
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
 <%- else -%>
 ---
 apiVersion: v1
