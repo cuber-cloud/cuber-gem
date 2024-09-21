@@ -66,6 +66,9 @@ module Cuber::Commands
       tag = "#{@options[:image]}:#{@options[:release]}"
       cmd = ['docker', 'build']
       cmd += ['--pull', '--no-cache'] if @options[:cache] == false
+      @options[:buildargs].each do |key, value|
+        cmd += ['--build-arg', "#{key}=#{value}"]
+      end
       cmd += ['--platform', 'linux/amd64', '--progress', 'plain', '-f', dockerfile, '-t', tag, '.']
       system(*cmd, chdir: '.cuber/repo') || abort('Cuber: docker build failed')
     end
