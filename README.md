@@ -15,7 +15,7 @@ Unlike other tools that add more options and more complexity to Kubernetes, Cube
 You just need to create a `Cuberfile`, with ~10 lines of code, and then type `cuber deploy` to package and deploy your app on any Kubernetes cluster.
 
 Kubernetes is up to 80% cheaper compared to PaaS like Heroku and you can choose between different cloud providers (no lock-in).
-It is also reliable and it can scale applications of any size.
+It is also reliable, it gives you more visibility and control on your application and it can scale applications of any size.
 The only downside is that it's complex and requires many steps and configurations, even if most applications share the same needs...
 Cuber makes Kubernetes simple and more concise.
 In this way you have the simplicity of a PaaS, at the cost of bare infrastructure.
@@ -74,7 +74,7 @@ Check out the [Cuberfile configuration](https://cuber.cloud/docs/cuberfile) and 
 
 ## Production-ready
 
-We have built Cuber for scaling [Pushpad](https://pushpad.xyz). Cuber has been used in production for over a year and it is stable and reliable. We had 100% uptime and we saved 80% on cloud costs.
+We have built Cuber for scaling [Pushpad](https://pushpad.xyz). Cuber has been used in production for many years and it is stable and reliable. We successfully reached 100% uptime while saving 80% on cloud costs.
 
 Cuber is a mature project that has all the features needed for deploying applications on Kubernetes and it is used every day for several projects.
 
