@@ -11,7 +11,7 @@ spec:
   containers:
   - name: pod-proc
     image: <%= @options[:image] %>:<%= @options[:release] %>
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     command: ["sleep", "infinity"]
     envFrom:
     - configMapRef:
