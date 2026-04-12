@@ -76,7 +76,7 @@ Check out the [Cuberfile configuration](https://cuber.cloud/docs/cuberfile) and 
 
 We have built Cuber for scaling [Pushpad](https://pushpad.xyz). Cuber has been used in production for many years and it is stable and reliable. We successfully reached 100% uptime while saving 80% on cloud costs.
 
-Cuber is a mature project that has all the features needed for deploying applications on Kubernetes and it is used every day for several projects.
+Cuber is a mature project that has all the features needed for deploying applications on Kubernetes and it is used every day for several projects (including [BuonMenu](https://buonmenu.com), [Newsletter.page](https://newsletter.page) and many others).
 
 ## License
 
