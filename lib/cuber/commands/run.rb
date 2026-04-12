@@ -33,15 +33,15 @@ module Cuber::Commands
 
     def kubeexec command
       @options[:pod] = "pod-#{command.downcase.gsub(/[^a-z0-9]+/, '-')}-#{Time.now.utc.iso8601.delete('^0-9')}"
-      path = ".cuber/kubernetes/#{@options[:pod]}.yml"
       full_command = command.shellsplit
       full_command.unshift 'launcher' unless @options[:buildpacks].to_s.strip.empty?
-      render 'pod.yml', path
-      kubectl 'apply', '-f', path
+      Tempfile.create(['pod', '.yml']) do |temp|
+        render 'pod.yml', temp.path
+        kubectl 'apply', '-f', temp.path
+      end
       kubectl 'wait', '--for', 'condition=ready', "pod/#{@options[:pod]}"
       kubectl 'exec', '-it', @options[:pod], '--', *full_command
       kubectl 'delete', 'pod', @options[:pod], '--wait=false'
-      File.delete path
     end
 
   end

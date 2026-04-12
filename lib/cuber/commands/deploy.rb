@@ -7,6 +7,7 @@ module Cuber::Commands
     end
 
     def execute
+      mktmpdirs
       if @options[:release]
         print_step 'Deploying a past release'
       else
@@ -22,9 +23,21 @@ module Cuber::Commands
       configure
       apply
       rollout
+    ensure
+      rmtmpdirs
     end
 
     private
+    
+    def mktmpdirs
+      @repo_tmpdir = Dir.mktmpdir
+      @kubernetes_tmpdir = Dir.mktmpdir
+    end
+    
+    def rmtmpdirs
+      FileUtils.remove_entry @repo_tmpdir
+      FileUtils.remove_entry @kubernetes_tmpdir
+    end
 
     def print_step desc
       puts
@@ -33,17 +46,14 @@ module Cuber::Commands
 
     def checkout
       print_step 'Cloning Git repository'
-      path = '.cuber/repo'
-      FileUtils.mkdir_p path
-      FileUtils.rm_rf path, secure: true
       cmd = ['git', 'clone']
       cmd += ['--branch', @options[:repo][:branch]] if @options[:repo][:branch]
-      cmd += ['--depth', '1', @options[:repo][:url], path]
+      cmd += ['--depth', '1', @options[:repo][:url], @repo_tmpdir]
       system(*cmd) || abort('Cuber: git clone failed')
     end
 
     def commit_hash
-      out, status = Open3.capture2 'git', 'rev-parse', '--short', 'HEAD', chdir: '.cuber/repo'
+      out, status = Open3.capture2 'git', 'rev-parse', '--short', 'HEAD', chdir: @repo_tmpdir
       abort 'Cuber: cannot get commit hash' unless status.success?
       out.strip
     end
@@ -57,7 +67,7 @@ module Cuber::Commands
       tag = "#{@options[:image]}:#{@options[:release]}"
       cmd = ['pack', 'build', tag, '--builder', @options[:buildpacks], '--publish']
       cmd += ['--pull-policy', 'always', '--clear-cache'] if @options[:cache] == false
-      system(*cmd, chdir: '.cuber/repo') || abort('Cuber: pack build failed')
+      system(*cmd, chdir: @repo_tmpdir) || abort('Cuber: pack build failed')
     end
 
     def build
@@ -67,7 +77,7 @@ module Cuber::Commands
       cmd = ['docker', 'build']
       cmd += ['--pull', '--no-cache'] if @options[:cache] == false
       cmd += ['--platform', 'linux/amd64', '--progress', 'plain', '-f', dockerfile, '-t', tag, '.']
-      system(*cmd, chdir: '.cuber/repo') || abort('Cuber: docker build failed')
+      system(*cmd, chdir: @repo_tmpdir) || abort('Cuber: docker build failed')
     end
 
     def push
@@ -80,13 +90,13 @@ module Cuber::Commands
       print_step 'Generating Kubernetes configuration'
       @options[:instance] = "#{@options[:app]}-#{Time.now.utc.iso8601.delete('^0-9')}"
       @options[:dockerconfigjson] = Base64.strict_encode64 File.read File.expand_path(@options[:dockerconfig] || '~/.docker/config.json')
-      render 'deployment.yml', '.cuber/kubernetes/deployment.yml'
+      render 'deployment.yml', File.join(@kubernetes_tmpdir, 'deployment.yml')
     end
 
     def apply
       print_step 'Applying configuration to Kubernetes cluster'
       kubectl 'apply',
-        '-f', '.cuber/kubernetes/deployment.yml',
+        '-f', File.join(@kubernetes_tmpdir, 'deployment.yml'),
         '--prune', '-l', "app.kubernetes.io/name=#{@options[:app]},app.kubernetes.io/managed-by=cuber"
     end
 

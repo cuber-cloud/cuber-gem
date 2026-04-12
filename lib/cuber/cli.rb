@@ -1,4 +1,6 @@
 require 'optparse'
+require 'tmpdir'
+require 'tempfile'
 require 'fileutils'
 require 'open3'
 require 'erb'
